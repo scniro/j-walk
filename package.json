@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/scniro/j-walk/issues"
   },
-  "homepage": "https://github.com/scniro/j-walk#readme"
+  "homepage": "https://github.com/scniro/j-walk#readme",
+  "devDependencies": {
+    "chai": "^3.4.1",
+    "mocha": "^2.3.4"
+  }
 }
