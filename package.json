@@ -1,0 +1,19 @@
+{
+  "name": "j-walk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "j-walk.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/scniro/j-walk.git"
+  },
+  "author": "scniro",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/scniro/j-walk/issues"
+  },
+  "homepage": "https://github.com/scniro/j-walk#readme"
+}
