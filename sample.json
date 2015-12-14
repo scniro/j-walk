@@ -1,0 +1,12 @@
+{
+  "root": {
+    "childA": {
+      "childB": {
+        "childC": {
+          "childD": "yaaaa"
+        }
+      }
+    }
+  },
+  "sibling": 1
+}
