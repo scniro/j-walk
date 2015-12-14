@@ -1,6 +1,5 @@
 var chai = require('chai');
 var expect = chai.expect;
-
 var jw = require('./j-walk.js');
 
 chai.should();
@@ -122,6 +121,7 @@ describe('j-walk tests:get', function () {
 });
 
 describe('j-walk tests:set', function () {
+
     it('should set the root value: 42. empty object - undefined property', function () {
         var base = {};
 
@@ -281,6 +281,59 @@ describe('j-walk tests:set', function () {
     });
 })
 
-describe('j-walk tests:exists', function() {
+describe('j-walk tests:exists', function () {
 
+    it('should return:true - defined property', function () {
+        var base = {'root': null};
+
+        jw(base).exists('root').should.be.true;
+    });
+
+    it('should return:true - defined property:nested', function () {
+        var base = {
+            'root': {
+                'nested': {
+                    'deeper': null
+                }
+            }
+        };
+
+        jw(base).exists('root.nested.deeper').should.be.true;
+    });
+
+    it('should return:true - defined property:nested - shallow target - complex object', function () {
+        var base = {
+            'root': {
+                'nested': {
+                    'deeper': null
+                },
+                'sibling': {}
+            }
+        };
+
+        jw(base).exists('root.sibling').should.be.true;
+    });
+
+    it('should return:false - undefined property: object root', function () {
+        var base = {};
+        jw(base).exists('root').should.be.false;
+    });
+
+    it('should return:false - undefined property: single nested', function () {
+        var base = {
+            'root': {
+            }
+        };
+        jw(base).exists('root.sub').should.be.false;
+    });
+
+    it('should return:false - undefined property: deeply nested', function () {
+        var base = {
+            'root': {
+                'sub': {
+                }
+            }
+        };
+        jw(base).exists('root.sub.deeper').should.be.false;
+    });
 });

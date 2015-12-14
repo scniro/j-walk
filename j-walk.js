@@ -20,8 +20,23 @@ function jw(o) {
         return found;
     }
 
-    function exists(query) {
-        return true;
+    function exists(o, query) {
+        var tree = query.split('.')
+        var exists = false;
+
+        function find(o) {
+            var property = tree.shift();
+
+            if (o.hasOwnProperty(property) && tree.length > 0) {
+                find(o[property])
+            } else {
+                exists = o.hasOwnProperty(property)
+                return;
+            }
+        }
+
+        find(o)
+        return exists;
     }
 
     function set(o, query, value) {
@@ -83,7 +98,6 @@ function jw(o) {
     }
 
     this.get = function (query) {
-
         if (!query || typeof query !== 'string')
             return 'get error'
 
@@ -101,16 +115,10 @@ function jw(o) {
         if (!query || typeof query !== 'string')
             return 'exists error'
 
-        return exists(query)
+        return exists(o, query)
     }
 
     return this;
 }
-
-var ob = {};
-
-var exists = jw(ob).exists('root')
-
-console.log(exists);
 
 module.exports = jw;
