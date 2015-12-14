@@ -20,6 +20,10 @@ function jw(o) {
         return found;
     }
 
+    function exists(query) {
+        return true;
+    }
+
     function set(o, query, value) {
 
         var tree = query.split('.')
@@ -93,7 +97,20 @@ function jw(o) {
         return set(o, query, value)
     }
 
+    this.exists = function(query) {
+        if (!query || typeof query !== 'string')
+            return 'exists error'
+
+        return exists(query)
+    }
+
     return this;
 }
+
+var ob = {};
+
+var exists = jw(ob).exists('root')
+
+console.log(exists);
 
 module.exports = jw;

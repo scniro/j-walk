@@ -5,7 +5,7 @@ var jw = require('./j-walk.js');
 
 chai.should();
 
-describe('j-walk get selector tests', function () {
+describe('j-walk tests:get', function () {
 
     it('should return the value: 42', function () {
         var base = {'root': 42};
@@ -119,4 +119,168 @@ describe('j-walk get selector tests', function () {
         };
         expect(jw(base).get('root.nested-a.nested-b.nested-c.nested-d')).to.be.undefined;
     });
+});
+
+describe('j-walk tests:set', function () {
+    it('should set the root value: 42. empty object - undefined property', function () {
+        var base = {};
+
+        jw(base).set('root', 42)
+
+        base.root.should.equal(42);
+    });
+
+    it('should set the immediate nested value: 42. empty object - undefined property', function () {
+        var base = {};
+
+        jw(base).set('root.nested', 42)
+
+        base.root.nested.should.equal(42);
+    });
+
+    it('should set the deeply nested value: 42. empty object - undefined property', function () {
+        var base = {};
+
+        jw(base).set('root.nested.sub', 42);
+
+        base.root.nested.sub.should.equal(42);
+    });
+
+    it('should set the immediate nested value: 42. object - pre-defined property', function () {
+        var base = {
+            nested: {}
+        };
+
+        jw(base).set('root.nested', 42);
+
+        base.root.nested.should.equal(42);
+    });
+
+    it('should set the deeply nested value: 42. object - pre-defined property', function () {
+        var base = {
+            nested: {
+                sub: {}
+            }
+        };
+
+        jw(base).set('root.nested.sub', 42);
+
+        base.root.nested.sub.should.equal(42);
+    });
+
+    it('should set the immediate nested value: 42. object - pre-defined target property. defined sibling. ignore sibling value of 84', function () {
+        var base = {
+            root: {
+                sub: {},
+                ignored: 84
+            }
+        };
+
+        jw(base).set('root.sub', 42)
+
+        base.root.sub.should.equal(42);
+        base.root.ignored.should.equal(84);
+    });
+
+    it('should set the deeply nested value: 42. object - pre-defined target property. defined sibling. ignore sibling value of 84', function () {
+        var base = {
+            root: {
+                sub: {
+                    inner: {}
+                },
+                ignored: 84
+            }
+        };
+
+        jw(base).set('root.sub.inner', 42)
+
+        base.root.sub.inner.should.equal(42);
+        base.root.ignored.should.equal(84);
+    });
+
+    it('should set the immediate nested value: 42. object - pre-defined target property. defined sibling. ignore sibling value of 84', function () {
+        var base = {
+            root: {
+                ignored: 84
+            }
+        };
+
+        jw(base).set('root.sub', 42)
+
+        base.root.sub.should.equal(42);
+        base.root.ignored.should.equal(84);
+    });
+
+    it('should set the deeply nested value: 42. object - pre-defined target property. defined sibling. ignore sibling value of 84', function () {
+        var base = {
+            root: {
+                ignored: 84
+            }
+        };
+
+        jw(base).set('root.sub.inner', 42)
+
+        base.root.sub.inner.should.equal(42);
+        base.root.ignored.should.equal(84);
+    });
+
+    it('should set the immediate nested value: [object]. object - undefined target property. defined sibling. ignore sibling value of 84', function () {
+        var base = {
+            root: {
+                ignored: 84
+            }
+        };
+
+        var value = {
+            val: 42
+        }
+
+        jw(base).set('root.sub', value)
+
+        base.root.sub.should.deep.equal(value);
+        base.root.ignored.should.equal(84);
+    });
+
+    it('should set the deeply nested value: [object]. object - undefined target property. defined sibling. ignore sibling value of 84', function () {
+        var base = {
+            root: {
+                ignored: 84
+            }
+        };
+
+        var value = {
+            nested: {
+                val: 42
+            }
+        }
+
+        jw(base).set('root.sub', value)
+
+        base.root.sub.should.deep.equal(value);
+        base.root.ignored.should.equal(84);
+    });
+
+    it('should set the immediate nested value: [object]. object - pre-defined target property. defined sibling. ignore sibling value of 84', function () {
+        var base = {
+            root: {
+                ignored: 84
+            },
+            sub: {
+                val: {}
+            }
+        };
+
+        var value = {
+            val: 42
+        }
+
+        jw(base).set('root.sub', value)
+
+        base.root.sub.should.deep.equal(value);
+        base.root.ignored.should.equal(84);
+    });
+})
+
+describe('j-walk tests:exists', function() {
+
 });
