@@ -1,14 +1,3 @@
-var fs = require('fs')
-
-var obj = {
-    'root': {
-        'value': {
-            'subvalue': 42
-        }
-    }
-}
-
-
 function jw(o) {
 
     function get(o, query) {
@@ -40,10 +29,7 @@ function jw(o) {
         function nest(names) {
             var object = {};
             names.reduce(function (o, s) {
-
-
-
-                return  s === define ? o[s] = value : o[s] = {};
+                return s === define ? o[s] = value : o[s] = {};
             }, object);
             return object;
         };
@@ -56,7 +42,7 @@ function jw(o) {
                 reverse(obj[property])
             } else {
 
-                if(identified) {
+                if (identified) {
                     obj[identified][last] = nested[last]
                 } else {
                     obj[last] = nested[last]
@@ -73,8 +59,12 @@ function jw(o) {
                 traverse(obj[property])
             } else {
 
-                var exist = query.split(property)[0].split('.').filter(function(x){ return x !== '' });
-                var undef = query.split(property)[1].split('.').filter(function(x){ return x !== '' });
+                var exist = query.split(property)[0].split('.').filter(function (x) {
+                    return x !== ''
+                });
+                var undef = query.split(property)[1].split('.').filter(function (x) {
+                    return x !== ''
+                });
                 undef.unshift(property)
                 identified = exist[exist.length - 1];
                 define = undef[undef.length - 1];
@@ -90,14 +80,14 @@ function jw(o) {
 
     this.get = function (query) {
 
-        if(!query || typeof query !== 'string')
+        if (!query || typeof query !== 'string')
             return 'get error'
 
         return get(o, query);
     }
 
     this.set = function (query, value) {
-        if(!query || typeof query !== 'string')
+        if (!query || typeof query !== 'string')
             return 'set error'
 
         return set(o, query, value)
@@ -107,16 +97,3 @@ function jw(o) {
 }
 
 module.exports = jw;
-
-
-var found = jw(obj).get('root');
-
-console.log(found)
-
-//jw(obj).set('root.childA.childB.childC.childD', 'yaaaa');
-//
-//var found = jw(obj).get('root.childA.childB.childC.childD');
-//
-//fs.writeFile('./sample.json', JSON.stringify(obj, null, 2), function (err) {
-//
-//});

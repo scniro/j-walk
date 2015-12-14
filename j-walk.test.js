@@ -5,7 +5,7 @@ var jw = require('./j-walk.js');
 
 chai.should();
 
-describe('get object value test', function () {
+describe('j-walk get selector tests', function () {
 
     it('should return the value: 42', function () {
         var base = {'root': 42};
@@ -71,7 +71,7 @@ describe('get object value test', function () {
         jw(base).get('root.nested-a.nested-b.nested-c').should.equal(42);
     });
 
-    it('should return the value: 42. single nested. root sibling value ignored but remains 84', function () {
+    it('should return the value: 42. single nested. root sibling value ignored - remains 84', function () {
         var base = {
             'root': {
                 'nested-a': 42,
@@ -82,7 +82,7 @@ describe('get object value test', function () {
         base.root['sibling-a'].should.equal(84);
     });
 
-    it('should return the value: 42. deeply nested. root sibling value ignored but remains 84', function () {
+    it('should return the value: 42. deeply nested. root sibling value ignored - remains 84', function () {
         var base = {
             'root': {
                 'nested-a': {
@@ -95,6 +95,11 @@ describe('get object value test', function () {
         };
         jw(base).get('root.nested-a.nested-b.nested-c').should.equal(42)
         base.root['sibling-a'].should.equal(84);
+    });
+
+    it('should return the value: undefined. selector specified for empty object', function () {
+        var base = {};
+        expect(jw(base).get('root.nested-a')).to.be.undefined;
     });
 
     it('should return the value: undefined. single additional selector not defined on object', function () {
