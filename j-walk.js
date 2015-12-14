@@ -1,9 +1,13 @@
 var fs = require('fs')
 
 var obj = {
-    "root": {},
-    "sibling": 1
+    'root': {
+        'value': {
+            'subvalue': 42
+        }
+    }
 }
+
 
 function jw(o) {
 
@@ -102,10 +106,17 @@ function jw(o) {
     return this;
 }
 
-jw(obj).set('root.childA.childB.childC.childD', 'yaaaa');
+module.exports = jw;
 
-var found = jw(obj).get('root.childA.childB.childC.childD');
 
-fs.writeFile('./sample.json', JSON.stringify(obj, null, 2), function (err) {
+var found = jw(obj).get('root');
 
-});
+console.log(found)
+
+//jw(obj).set('root.childA.childB.childC.childD', 'yaaaa');
+//
+//var found = jw(obj).get('root.childA.childB.childC.childD');
+//
+//fs.writeFile('./sample.json', JSON.stringify(obj, null, 2), function (err) {
+//
+//});
