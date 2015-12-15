@@ -111,7 +111,7 @@ function jw(o) {
         return set(o, query, value)
     }
 
-    this.exists = function(query) {
+    this.exists = function (query) {
         if (!query || typeof query !== 'string')
             return 'exists error'
 
@@ -120,5 +120,23 @@ function jw(o) {
 
     return this;
 }
+
+var ob1 = {
+    'root': [
+        {'a': 2},
+        {'b': {'sub': 4}},
+        {'c': {'sub': [{'x': 10}, {'y': 20}, {'z': 30}]}}
+    ]
+}
+
+var a = jw(ob1).get('root[a]') // 2
+
+var b = jw(ob1).get('root[b].sub') // 4
+
+var c = jw(ob1).get('root[c].sub[x]') // 20
+
+console.log(a);
+console.log(b);
+console.log(c);
 
 module.exports = jw;

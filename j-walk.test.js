@@ -279,7 +279,7 @@ describe('j-walk tests:set', function () {
         base.root.sub.should.deep.equal(value);
         base.root.ignored.should.equal(84);
     });
-})
+});
 
 describe('j-walk tests:exists', function () {
 
@@ -321,8 +321,7 @@ describe('j-walk tests:exists', function () {
 
     it('should return:false - undefined property: single nested', function () {
         var base = {
-            'root': {
-            }
+            'root': {}
         };
         jw(base).exists('root.sub').should.be.false;
     });
@@ -330,8 +329,7 @@ describe('j-walk tests:exists', function () {
     it('should return:false - undefined property: deeply nested', function () {
         var base = {
             'root': {
-                'sub': {
-                }
+                'sub': {}
             }
         };
         jw(base).exists('root.sub.deeper').should.be.false;

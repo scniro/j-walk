@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/scniro/j-walk.git"
   },
-  "author": "scniro",
+  "author": "scniro <salvatore.niro@outlook.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/scniro/j-walk/issues"
