@@ -1,8 +1,46 @@
+function jwEngine() {
+
+    function constructNestedObject(properties, target, value) {
+
+        var object = {};
+        properties.reduce(function (o, s) {
+            return s === target ? o[s] = value : o[s] = {};
+        }, object);
+        return object;
+    }
+
+    function parseQuery(criteria) {
+
+        var tree = criteria.split('.')
+        var bracketsRegex = /\[(.*?)\]/;
+        var query = [];
+
+        tree.forEach(function (value) {
+            if (value.match(bracketsRegex)) {
+                var name = value.split(bracketsRegex).filter(function (x) {
+                    return x !== ''
+                })[0]
+                var arr = value.split(bracketsRegex)[1]
+                query.push({'prop': name, 'index': arr})
+            } else {
+                query.push(value)
+            }
+        });
+
+        return query;
+    }
+
+    return {
+        'constructNestedObject': constructNestedObject,
+        'parseQuery': parseQuery
+    }
+}
+
 function jw(o) {
 
     function get(o, query) {
 
-        var tree = query.split('.')
+        var tree = engine.parseQuery(query)
         var found;
 
         function find(o) {
@@ -21,7 +59,8 @@ function jw(o) {
     }
 
     function exists(o, query) {
-        var tree = query.split('.')
+
+        var tree = engine.parseQuery(query)
         var exists = false;
 
         function find(o) {
@@ -41,17 +80,9 @@ function jw(o) {
 
     function set(o, query, value) {
 
-        var tree = query.split('.')
-        var nested, identified, last, define;
+        var tree = engine.parseQuery(query)
+        var nested, identified, last;
         var exists = [];
-
-        function nest(names) {
-            var object = {};
-            names.reduce(function (o, s) {
-                return s === define ? o[s] = value : o[s] = {};
-            }, object);
-            return object;
-        };
 
         function reverse(obj) {
 
@@ -86,9 +117,8 @@ function jw(o) {
                 });
                 undef.unshift(property)
                 identified = exist[exist.length - 1];
-                define = undef[undef.length - 1];
                 last = undef[0]
-                nested = nest(undef);
+                nested = engine.constructNestedObject(undef, undef[undef.length - 1], value)
 
                 reverse(o)
             }
@@ -121,22 +151,27 @@ function jw(o) {
     return this;
 }
 
-var ob1 = {
-    'root': [
-        {'a': 2},
-        {'b': {'sub': 4}},
-        {'c': {'sub': [{'x': 10}, {'y': 20}, {'z': 30}]}}
-    ]
-}
+var engine = new jwEngine();
 
-var a = jw(ob1).get('root[a]') // 2
+//var ob1 = {
+//    'root': [
+//        {'a': 2},
+//        {'b': {'sub': 4}},
+//        {'c': {'sub': [{'x': 10}, {'y': 20}, {'z': 30}]}}
+//    ]
+//}
+//
+//jw({}).get('sub')
 
-var b = jw(ob1).get('root[b].sub') // 4
+//var a = jw(ob1).get('root[a]') // 2
+//
+//var b = jw(ob1).get('root[b].sub') // 4
+//
+//var c = jw(ob1).get('root[c].sub[x]') // 20
+//
+//console.log(a);
+//console.log(b);
+//console.log(c);
 
-var c = jw(ob1).get('root[c].sub[x]') // 20
-
-console.log(a);
-console.log(b);
-console.log(c);
-
-module.exports = jw;
+module.exports.jw = jw;
+module.exports.jwEngine = jwEngine;

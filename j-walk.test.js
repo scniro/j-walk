@@ -1,6 +1,7 @@
 var chai = require('chai');
 var expect = chai.expect;
-var jw = require('./j-walk.js');
+var jw = require('./j-walk.js').jw;
+var engine = new require('./j-walk.js').jwEngine();
 
 chai.should();
 
@@ -333,5 +334,71 @@ describe('j-walk tests:exists', function () {
             }
         };
         jw(base).exists('root.sub.deeper').should.be.false;
+    });
+});
+
+describe('j-walk tests:engine', function () {
+
+    it('should parse the dot notation selector query:single value', function () {
+        var query = 'root'
+        var expected = ['root']
+        var actual = engine.parseQuery(query)
+        actual.should.deep.equal(expected);
+    });
+
+    it('should parse the dot notation selector query:simple', function () {
+        var query = 'root.sub.nested'
+        var expected = ['root', 'sub', 'nested']
+        var actual = engine.parseQuery(query)
+        actual.should.deep.equal(expected);
+    });
+
+    it('should parse the dot notation selector query:single array', function () {
+        var query = 'root.sub[sub-a].nested'
+        var expected = ['root', {'prop': 'sub', 'index': 'sub-a'}, 'nested']
+        var actual = engine.parseQuery(query)
+
+        actual.should.deep.equal(expected);
+    });
+
+    it('should parse the dot notation selector query:multiple array', function () {
+        var query = 'root.sub[sub-a].nested[sub-b].last'
+        var expected = ['root', {'prop': 'sub', 'index': 'sub-a'}, {'prop': 'nested', 'index': 'sub-b'}, 'last']
+        var actual = engine.parseQuery(query)
+        actual.should.deep.equal(expected);
+    });
+
+    it('should create a nested object - initialize target value with empty object', function () {
+
+        var criteria = ['root', 'sub', 'nested']
+
+        var expected = {
+            'root': {
+                'sub': {
+                    'nested': {}
+                }
+            }
+        };
+
+        var actual = engine.constructNestedObject(criteria)
+
+        actual.should.deep.equal(expected);
+    });
+
+    it('should create a nested object - initialize object with target property and value: [nested]:42', function () {
+
+        var criteria = ['root', 'sub', 'nested']
+
+        var expected = {
+            'root': {
+                'sub': {
+                    'nested': 42
+                }
+            }
+        };
+
+        var actual = engine.constructNestedObject(criteria, 'nested', 42)
+
+        actual.should.deep.equal(expected);
     });
 });
