@@ -2,8 +2,37 @@ var chai = require('chai');
 var expect = chai.expect;
 var jw = require('./j-walk.js').jw;
 var engine = new require('./j-walk.js').jwEngine();
+var exception = require('./j-walk.js').jwException;
 
 chai.should();
+
+describe('j-walk tests:init', function(){
+    it('should throw exception: jwException - unable to parse selector query for invalid criteria', function () {
+        expect(function () {
+            jw(42).get('whatever')
+        }).to.throw(new exception('j-walk: invalid selector. expected: object'));
+
+        expect(function () {
+            jw('').get('whatever')
+        }).to.throw(new exception('j-walk: invalid selector. expected: object'));
+
+        expect(function () {
+            jw(true).get('whatever')
+        }).to.throw(new exception('j-walk: invalid selector. expected: object'));
+
+        expect(function () {
+            jw(undefined).get('whatever')
+        }).to.throw(new exception('j-walk: invalid selector. expected: object'));
+
+        expect(function () {
+            jw(null).get('whatever')
+        }).to.throw(new exception('j-walk: invalid selector. expected: object'));
+
+        expect(function () {
+            jw(['a', 'b', 'c']).get('whatever')
+        }).to.throw(new exception('j-walk: invalid selector. expected: object'));
+    })
+});
 
 describe('j-walk tests:get', function () {
 
@@ -346,7 +375,7 @@ describe('j-walk tests:engine', function () {
         actual.should.deep.equal(expected);
     });
 
-    it('should parse the dot notation selector query:simple', function () {
+    it('should parse the dot notation selector query:nested', function () {
         var query = 'root.sub.nested'
         var expected = ['root', 'sub', 'nested']
         var actual = engine.parseQuery(query)
@@ -361,7 +390,7 @@ describe('j-walk tests:engine', function () {
         actual.should.deep.equal(expected);
     });
 
-    it('should parse the dot notation selector query:multiple array', function () {
+    it('should parse the dot notation selector query:nested array', function () {
         var query = 'root.sub[sub-a].nested[sub-b].last'
         var expected = ['root', {'prop': 'sub', 'index': 'sub-a'}, {'prop': 'nested', 'index': 'sub-b'}, 'last']
         var actual = engine.parseQuery(query)
@@ -401,4 +430,30 @@ describe('j-walk tests:engine', function () {
 
         actual.should.deep.equal(expected);
     });
+
+    it('should throw exception: jwException - unable to parse selector query for invalid criteria', function () {
+        expect(function () {
+            engine.parseQuery(42)
+        }).to.throw(new exception('j-walk: invalid selector query format. expected: string'));
+
+        expect(function () {
+            engine.parseQuery('')
+        }).to.throw(new exception('j-walk: invalid selector query format. expected: string'));
+
+        expect(function () {
+            engine.parseQuery({})
+        }).to.throw(new exception('j-walk: invalid selector query format. expected: string'));
+
+        expect(function () {
+            engine.parseQuery(undefined)
+        }).to.throw(new exception('j-walk: invalid selector query format. expected: string'));
+
+        expect(function () {
+            engine.parseQuery(null)
+        }).to.throw(new exception('j-walk: invalid selector query format. expected: string'));
+
+        expect(function () {
+            engine.parseQuery(['a', 'b', 'c'])
+        }).to.throw(new exception('j-walk: invalid selector query format. expected: string'));
+    })
 });

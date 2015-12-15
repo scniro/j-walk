@@ -1,3 +1,9 @@
+function jwException(message) {
+    Error.captureStackTrace && Error.captureStackTrace(this, this.constructor);
+    this.name = this.constructor.name;
+    this.message = message;
+}
+
 function jwEngine() {
 
     function constructNestedObject(properties, target, value) {
@@ -10,6 +16,9 @@ function jwEngine() {
     }
 
     function parseQuery(criteria) {
+
+        if (!criteria || typeof criteria !== 'string')
+            throw new jwException('j-walk: invalid selector query format. expected: string')
 
         var tree = criteria.split('.')
         var bracketsRegex = /\[(.*?)\]/;
@@ -38,6 +47,9 @@ function jwEngine() {
 
 function jw(o) {
 
+    if (!o || typeof o !== 'object' || Array.isArray(o))
+        throw new jwException('j-walk: invalid selector. expected: object')
+
     function get(o, query) {
 
         var tree = engine.parseQuery(query)
@@ -46,11 +58,28 @@ function jw(o) {
         function find(o) {
             var property = tree.shift();
 
-            if (o.hasOwnProperty(property) && tree.length > 0) {
-                find(o[property])
+            if (typeof property === 'object') {
+
+                for (var i = 0; i < o[property.prop].length; i += 1) {
+                    if (o[property.prop][i][property.index]) {
+
+                        var indexed = o[property.prop][i][property.index]
+
+                        if(tree.length > 0) {
+                            find(indexed)
+                        } else {
+                            found = indexed;
+                            return;
+                        }
+                    }
+                }
             } else {
-                found = o[property]
-                return;
+                if (o.hasOwnProperty(property) && tree.length > 0) {
+                    find(o[property])
+                } else {
+                    found = o[property]
+                    return;
+                }
             }
         }
 
@@ -128,23 +157,14 @@ function jw(o) {
     }
 
     this.get = function (query) {
-        if (!query || typeof query !== 'string')
-            return 'get error'
-
         return get(o, query);
     }
 
     this.set = function (query, value) {
-        if (!query || typeof query !== 'string')
-            return 'set error'
-
         return set(o, query, value)
     }
 
     this.exists = function (query) {
-        if (!query || typeof query !== 'string')
-            return 'exists error'
-
         return exists(o, query)
     }
 
@@ -153,25 +173,21 @@ function jw(o) {
 
 var engine = new jwEngine();
 
-//var ob1 = {
-//    'root': [
-//        {'a': 2},
-//        {'b': {'sub': 4}},
-//        {'c': {'sub': [{'x': 10}, {'y': 20}, {'z': 30}]}}
+//var o = {
+//    'identities': [
+//        {'facebook': 1},
+//        {'github': 2},
+//        {
+//            'gmail': {
+//                'nested': 42
+//            }
+//        }
 //    ]
 //}
 //
-//jw({}).get('sub')
-
-//var a = jw(ob1).get('root[a]') // 2
-//
-//var b = jw(ob1).get('root[b].sub') // 4
-//
-//var c = jw(ob1).get('root[c].sub[x]') // 20
-//
-//console.log(a);
-//console.log(b);
-//console.log(c);
+//console.log(jw(o).get('identities[gmail]') );         // { 'nested': 42 }
+//console.log(jw(o).get('identities[gmail].nested') );  // 42
 
 module.exports.jw = jw;
 module.exports.jwEngine = jwEngine;
+module.exports.jwException = jwException;
