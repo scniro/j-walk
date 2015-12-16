@@ -203,6 +203,20 @@ describe('j-walk tests:get', function () {
 
         jw(base).get('root.[sub-b].[deep-b]').should.equal(42);
     });
+
+    // this could be changed later on to return all matches, or traverse further - but will return first found for now
+    it('should return the value: 42, in the first array named instance if array contains duplicate sibling property names', function () {
+
+        var base = {
+            'root': [
+                {'sub-a': {'same': 42}},
+            ]
+        };
+
+        jw(base).get('root.[sub-a].same').should.equal(42);
+        jw(base).get('root.[sub-a].same').should.not.equal(84);
+        jw(base).get('root.[sub-a].same').should.not.equal('no way');
+    });
 });
 
 describe('j-walk tests:set', function () {
