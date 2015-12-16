@@ -23,9 +23,11 @@ function jwEngine() {
         var tree = criteria.split('.')
         var bracketsRegex = /\[(.*?)\]/;
 
-        for(var i = 0; i < tree.length; i += 1) {
-            if(tree[i].match(bracketsRegex)) {
-                var transformed = tree[i].split(bracketsRegex).filter(function(x){ return x !== '' })
+        for (var i = 0; i < tree.length; i += 1) {
+            if (tree[i].match(bracketsRegex)) {
+                var transformed = tree[i].split(bracketsRegex).filter(function (x) {
+                    return x !== ''
+                })
                 tree[i] = transformed
             }
         }
@@ -52,8 +54,17 @@ function jw(o) {
         function find(o) {
             var property = tree.shift();
 
-            if(Array.isArray(property)) {
-                console.log(o)
+            if (Array.isArray(property)) {
+                for (var key in o) {
+                    if (o[key].hasOwnProperty(property[0])) {
+                        if (tree.length > 0) {
+                            find(o[key][property[0]])
+                        } else {
+                            found = o[key][property[0]]
+                            return;
+                        }
+                    }
+                }
             } else {
                 if (o.hasOwnProperty(property) && tree.length > 0) {
                     find(o[property])
@@ -101,7 +112,6 @@ function jw(o) {
             if (obj.hasOwnProperty(property) && exists.length > 0) {
                 reverse(obj[property])
             } else {
-
                 if (identified) {
                     obj[identified][last] = nested[last]
                 } else {
@@ -153,16 +163,6 @@ function jw(o) {
 }
 
 var engine = new jwEngine();
-
-//var ob = {
-//    'root': [
-//        {'a': 2},
-//        {'b': 4},
-//        {'c': 6}
-//    ]
-//}
-//
-//console.log('final: ' + jw(ob).get('root.[a]'))
 
 module.exports.jw = jw;
 module.exports.jwEngine = jwEngine;

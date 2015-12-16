@@ -149,31 +149,60 @@ describe('j-walk tests:get', function () {
         expect(jw(base).get('root.nested-a.nested-b.nested-c.nested-d')).to.be.undefined;
     });
 
-    //it('should return the value: 42. single nested array selector', function () {
-    //
-    //    var base = {
-    //        'root': [
-    //            {'sub-a': 26},
-    //            {'sub-b': 42},
-    //            {'sub-c': 84}
-    //        ]
-    //    };
-    //
-    //    jw(base).get('root[sub-b]').should.equal(42);
-    //});
-    //
-    //it('should return the value: 42. single nested array selector. nested value', function () {
-    //
-    //    var base = {
-    //        'root': [
-    //            {'sub-a': 26},
-    //            {'sub-b': {'target': 42}},
-    //            {'sub-c': 84}
-    //        ]
-    //    };
-    //
-    //    jw(base).get('subjects[sub-b].target').should.equal(42);
-    //});
+    it('should return the value: 42. single nested array selector', function () {
+
+        var base = {
+            'root': [
+                {'sub-a': 26},
+                {'sub-b': 42},
+                {'sub-c': 84}
+            ]
+        };
+
+        jw(base).get('root.[sub-b]').should.equal(42);
+    });
+
+    it('should return the value: 42. single nested array selector. nested single value', function () {
+
+        var base = {
+            'root': [
+                {'sub-a': 26},
+                {'sub-b': {'target': 42}},
+                {'sub-c': 84}
+            ]
+        };
+
+        jw(base).get('root.[sub-b].target').should.equal(42);
+    });
+
+    it('should return the value: 42. single nested array selector. nested object value', function () {
+
+        var base = {
+            'root': [
+                {'sub-a': 26},
+                {'sub-b': {'target': 42}},
+                {'sub-c': 84}
+            ]
+        };
+
+        var expected = {'target': 42}
+
+        jw(base).get('root.[sub-b]').should.deep.equal(expected);
+    });
+
+    it('should return the value: 42. multiple nested sibling arrays', function () {
+
+        var base = {
+            'root': [
+                {'sub-a': [{'deep-a': 10}, {'deep-b': 20}, {'deep-c': 30}]},
+                {'sub-b': [{'deep-a': 40}, {'deep-b': 42}, {'deep-d': 60}]},
+                {'sub-c': [{'deep-a': 70}, {'deep-b': 80}, {'deep-e': 90}]}
+            ],
+            'irrelevant': [2, 3, 6]
+        };
+
+        jw(base).get('root.[sub-b].[deep-b]').should.equal(42);
+    });
 });
 
 describe('j-walk tests:set', function () {
@@ -408,20 +437,20 @@ describe('j-walk tests:engine', function () {
         actual.should.deep.equal(expected);
     });
 
-    //it('should parse the dot notation selector query:single array', function () {
-    //    var query = 'root.sub[sub-a].nested'
-    //    var expected = ['root', {'prop': 'sub', 'index': 'sub-a'}, 'nested']
-    //    var actual = engine.parseQuery(query)
-    //
-    //    actual.should.deep.equal(expected);
-    //});
-    //
-    //it('should parse the dot notation selector query:nested array', function () {
-    //    var query = 'root.sub[sub-a].nested[sub-b].last'
-    //    var expected = ['root', {'prop': 'sub', 'index': 'sub-a'}, {'prop': 'nested', 'index': 'sub-b'}, 'last']
-    //    var actual = engine.parseQuery(query)
-    //    actual.should.deep.equal(expected);
-    //});
+    it('should parse the dot notation selector query:single array', function () {
+        var query = 'root.sub.[sub-a].nested'
+        var expected = ['root', 'sub', ['sub-a'], 'nested']
+        var actual = engine.parseQuery(query)
+
+        actual.should.deep.equal(expected);
+    });
+
+    it('should parse the dot notation selector query:nested array', function () {
+        var query = 'root.sub.[sub-a].nested.[sub-b].last'
+        var expected = ['root', 'sub', ['sub-a'], 'nested', ['sub-b'], 'last']
+        var actual = engine.parseQuery(query)
+        actual.should.deep.equal(expected);
+    });
 
     it('should create a nested object - initialize target value with empty object', function () {
 
