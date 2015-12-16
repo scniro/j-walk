@@ -22,21 +22,15 @@ function jwEngine() {
 
         var tree = criteria.split('.')
         var bracketsRegex = /\[(.*?)\]/;
-        var query = [];
 
-        tree.forEach(function (value) {
-            if (value.match(bracketsRegex)) {
-                var name = value.split(bracketsRegex).filter(function (x) {
-                    return x !== ''
-                })[0]
-                var arr = value.split(bracketsRegex)[1]
-                query.push({'prop': name, 'index': arr})
-            } else {
-                query.push(value)
+        for(var i = 0; i < tree.length; i += 1) {
+            if(tree[i].match(bracketsRegex)) {
+                var transformed = tree[i].split(bracketsRegex).filter(function(x){ return x !== '' })
+                tree[i] = transformed
             }
-        });
+        }
 
-        return query;
+        return tree;
     }
 
     return {
@@ -58,21 +52,8 @@ function jw(o) {
         function find(o) {
             var property = tree.shift();
 
-            if (typeof property === 'object') {
-
-                for (var i = 0; i < o[property.prop].length; i += 1) {
-                    if (o[property.prop][i][property.index]) {
-
-                        var indexed = o[property.prop][i][property.index]
-
-                        if(tree.length > 0) {
-                            find(indexed)
-                        } else {
-                            found = indexed;
-                            return;
-                        }
-                    }
-                }
+            if(Array.isArray(property)) {
+                console.log(o)
             } else {
                 if (o.hasOwnProperty(property) && tree.length > 0) {
                     find(o[property])
@@ -173,20 +154,15 @@ function jw(o) {
 
 var engine = new jwEngine();
 
-//var o = {
-//    'identities': [
-//        {'facebook': 1},
-//        {'github': 2},
-//        {
-//            'gmail': {
-//                'nested': 42
-//            }
-//        }
+//var ob = {
+//    'root': [
+//        {'a': 2},
+//        {'b': 4},
+//        {'c': 6}
 //    ]
 //}
 //
-//console.log(jw(o).get('identities[gmail]') );         // { 'nested': 42 }
-//console.log(jw(o).get('identities[gmail].nested') );  // 42
+//console.log('final: ' + jw(ob).get('root.[a]'))
 
 module.exports.jw = jw;
 module.exports.jwEngine = jwEngine;
