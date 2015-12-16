@@ -148,7 +148,9 @@ describe('j-walk tests:get', function () {
         };
         expect(jw(base).get('root.nested-a.nested-b.nested-c.nested-d')).to.be.undefined;
     });
+});
 
+describe('j-walk tests:get:array', function () {
     it('should return the value: 42. single nested array selector', function () {
 
         var base = {
@@ -216,6 +218,25 @@ describe('j-walk tests:get', function () {
         jw(base).get('root.[sub-a].same').should.equal(42);
         jw(base).get('root.[sub-a].same').should.not.equal(84);
         jw(base).get('root.[sub-a].same').should.not.equal('no way');
+    });
+
+    it('should return the value: 42, traversing multiple nested arrays', function () {
+
+        var base = {
+            'root': {
+                'parent-a': [
+                    {'child-a': {}},
+                    {'child-b': [
+                        {'grandchild-a': 21},
+                        {'grandchild-b': 42},
+                        {'grandchild-c': 84}]
+                    }],
+                'parent-b': {}
+            }
+        };
+
+        jw(base).get('root.parent-a.[child-b].[grandchild-b]').should.equal(42);
+
     });
 });
 
@@ -377,6 +398,35 @@ describe('j-walk tests:set', function () {
 
         base.root.sub.should.deep.equal(value);
         base.root.ignored.should.equal(84);
+    });
+});
+
+describe('j-walk tests:set:array', function (){
+    it('should set specified array value: {"value": 42}. undefined nested property. no siblings', function () {
+        var base = {
+            'root': {
+            }
+        };
+
+        jw(base).set('root.container.[nested]', 42)
+
+        base.root.container[0].nested.should.equal(42);
+        //regress
+        jw(base).get('root.container.[nested]').should.equal(42)
+    });
+
+    it('should set specified array value: {"value": 42}. defined nested property. no siblings', function () {
+        var base = {
+            'root': {
+                'container': []
+            }
+        };
+
+        jw(base).set('root.container.[nested]', 42)
+
+        base.root.container[0].nested.should.equal(42);
+        //regress
+        jw(base).get('root.container.[nested]').should.equal(42)
     });
 });
 

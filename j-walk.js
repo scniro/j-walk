@@ -6,13 +6,27 @@ function jwException(message) {
 
 function jwEngine() {
 
-    function constructNestedObject(properties, target, value) {
-
+    function constructNestedObject(properties, target, value, containsArray, isArray) {
         var object = {};
+        var arr = [];
+
         properties.reduce(function (o, s) {
-            return s === target ? o[s] = value : o[s] = {};
+
+            var constructed =  s === target ? o[s] = value : o[s] = {};
+
+            if(s !== target)
+                arr.push(constructed)
+
+            arr = arr.filter(function(x){ return x !== value })
+
+            if(s !== target && containsArray) {
+                o[s] = arr
+            }
+
+            return constructed;
         }, object);
-        return object;
+
+        return isArray ? [object] : object
     }
 
     function parseQuery(criteria) {
@@ -112,10 +126,35 @@ function jw(o) {
             if (obj.hasOwnProperty(property) && exists.length > 0) {
                 reverse(obj[property])
             } else {
-                if (identified) {
-                    obj[identified][last] = nested[last]
+                if (Array.isArray(obj[property])) {
+
+                    var contained = false;
+
+                    for (var key in obj[property]) {
+                        var k = Object.keys(obj[property][key])[0]
+                        if (k === last) {
+
+                            obj[property][key][k] = value;
+
+                            //if(exists.length > 0) {
+                            // recurse
+                            //}
+
+                            contained = true;
+                            return;
+                        }
+                    }
+
+                    if (!contained) {
+                        obj[property].push(nested[0])
+                    }
+
                 } else {
-                    obj[last] = nested[last]
+                    if (identified) {
+                        obj[identified][last] = nested[last]
+                    } else {
+                        obj[last] = nested[last]
+                    }
                 }
             }
         }
@@ -127,18 +166,26 @@ function jw(o) {
             if (obj.hasOwnProperty(property) && tree.length > 0) {
                 exists.push(property)
                 traverse(obj[property])
+                // prob search for middle array
             } else {
 
-                var exist = query.split(property)[0].split('.').filter(function (x) {
+                var  containArray = false;
+
+                if(query.match(/\[(.*?)\]/)) {
+                    containArray = true;
+                }
+
+                var reference = query.replace(/[\[\]']+/g, '').split('.').filter(function (x) {
                     return x !== ''
+                })
+                var undef = reference.filter(function (i) {
+                    return exists.indexOf(i) < 0;
                 });
-                var undef = query.split(property)[1].split('.').filter(function (x) {
-                    return x !== ''
-                });
-                undef.unshift(property)
-                identified = exist[exist.length - 1];
+                identified = exists[exists.length - 1];
                 last = undef[0]
-                nested = engine.constructNestedObject(undef, undef[undef.length - 1], value)
+                //nested = engine.constructNestedObject(undef, undef[undef.length - 1], value, Array.isArray(property))
+
+                nested = engine.constructNestedObject(undef, undef[undef.length - 1], value, containArray, Array.isArray(property))
 
                 reverse(o)
             }
