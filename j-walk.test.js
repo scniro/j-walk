@@ -518,7 +518,7 @@ describe('j-walk tests:engine', function () {
 
     it('should create a nested object - initialize target value with empty object', function () {
 
-        var criteria = ['root', 'sub', 'nested']
+        var criteria = [{'property': 'root',  'isArray': false}, {'property': 'sub',  'isArray': false}, {'property': 'nested',  'isArray': false}]
 
         var expected = {
             'root': {
@@ -535,7 +535,7 @@ describe('j-walk tests:engine', function () {
 
     it('should create a nested object - initialize object with target property and value: [nested]:42', function () {
 
-        var criteria = ['root', 'sub', 'nested']
+        var criteria = [{'property': 'root',  'isArray': false}, {'property': 'sub',  'isArray': false}, {'property': 'nested',  'isArray': false}]
 
         var expected = {
             'root': {
@@ -545,7 +545,7 @@ describe('j-walk tests:engine', function () {
             }
         };
 
-        var actual = engine.constructNestedObject(criteria, 'nested', 42)
+        var actual = engine.constructNestedObject(criteria, 42)
 
         actual.should.deep.equal(expected);
     });

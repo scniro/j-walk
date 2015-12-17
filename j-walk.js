@@ -6,27 +6,44 @@ function jwException(message) {
 
 function jwEngine() {
 
-    function constructNestedObject(properties, target, value, containsArray, isArray) {
-        var object = {};
-        var arr = [];
+    function constructNestedObject(propArr, value) {
 
-        properties.reduce(function (o, s) {
+        var built = {};
 
-            var constructed =  s === target ? o[s] = value : o[s] = {};
+        function nest(o) {
 
-            if(s !== target)
-                arr.push(constructed)
 
-            arr = arr.filter(function(x){ return x !== value })
+            if (propArr.length === 0)
+                return;
 
-            if(s !== target && containsArray) {
-                o[s] = arr
+            var property = propArr.shift();
+
+
+            if (propArr.length === 0) {
+                if (Array.isArray(o)) {
+                    var push = {}
+                    push[property['property']] = value ? value : {}
+
+                    o.push(push)
+
+                } else {
+
+                    o[property['property']] = value ? value : {};
+                }
+            } else {
+                if (property['isArray']) {
+                    o[property['property']] = []
+                } else {
+                    o[property['property']] = {}
+                }
             }
 
-            return constructed;
-        }, object);
+            nest(o[property['property']])
+        }
 
-        return isArray ? [object] : object
+        nest(built)
+
+        return built;
     }
 
     function parseQuery(criteria) {
@@ -123,10 +140,21 @@ function jw(o) {
 
             var property = exists.shift();
 
+
             if (obj.hasOwnProperty(property) && exists.length > 0) {
                 reverse(obj[property])
             } else {
                 if (Array.isArray(obj[property])) {
+
+                    if (obj[property].length > 0) {
+                        for (var two in obj[property]) {
+                            var t = Object.keys(obj[property][two])[0]
+                            if (t === last) {
+                                reverse(obj[property][two]);
+                            }
+                        }
+                    }
+
 
                     var contained = false;
 
@@ -146,10 +174,18 @@ function jw(o) {
                     }
 
                     if (!contained) {
-                        obj[property].push(nested[0])
+                        obj[property].push(nested)
+                    } else {
                     }
 
                 } else {
+
+                    //console.log(obj.nested.inner)
+
+                    console.log(last)
+
+                    //console.log(identified)
+
                     if (identified) {
                         obj[identified][last] = nested[last]
                     } else {
@@ -161,31 +197,69 @@ function jw(o) {
 
         function traverse(obj) {
 
+
+            //console.log(tree)
+
             var property = tree.shift();
 
-            if (obj.hasOwnProperty(property) && tree.length > 0) {
+
+
+            if (obj.hasOwnProperty(property) && tree.length !== 0) {
                 exists.push(property)
                 traverse(obj[property])
-                // prob search for middle array
             } else {
 
-                var  containArray = false;
 
-                if(query.match(/\[(.*?)\]/)) {
-                    containArray = true;
+                var undefined = [];
+                var reference = engine.parseQuery(query);
+
+                for (var i = 0; i < reference.length; i += 1) {
+
+                    if (reference[i] !== exists[i]) {
+
+                        var isArray = Array.isArray(reference[i])
+
+                        if (isArray && undefined.length > 0)
+                            undefined[undefined.length - 1].isArray = true;
+
+                        undefined.push({
+                            'property': isArray ? reference[i][0] : reference[i],
+                        });
+                    }
                 }
 
-                var reference = query.replace(/[\[\]']+/g, '').split('.').filter(function (x) {
-                    return x !== ''
-                })
-                var undef = reference.filter(function (i) {
-                    return exists.indexOf(i) < 0;
-                });
                 identified = exists[exists.length - 1];
-                last = undef[0]
-                //nested = engine.constructNestedObject(undef, undef[undef.length - 1], value, Array.isArray(property))
+                last = undefined[0].property
+                nested = engine.constructNestedObject(undefined, value);
 
-                nested = engine.constructNestedObject(undef, undef[undef.length - 1], value, containArray, Array.isArray(property))
+                console.log(nested)
+
+
+                //var  containArray = false;
+                //
+                //if(query.match(/\[(.*?)\]/)) {
+                //    containArray = true;
+                //}
+                //
+                //var reference = query.replace(/[\[\]']+/g, '').split('.').filter(function (x) {
+                //    return x !== ''
+                //})
+                //var undef = reference.filter(function (i) {
+                //    return exists.indexOf(i) < 0;
+                //});
+                //identified = exists[exists.length - 1];
+                //last = undef[0]
+                ////nested = engine.constructNestedObject(undef, undef[undef.length - 1], value, Array.isArray(property))
+                //
+                //var reference = engine.parseQuery(query);
+                //var arrIndex = [];
+                //
+                //for(var i=0; i < reference.length; i += 1) {
+                //    if(Array.isArray(reference[i]))
+                //        arrIndex.push(i)
+                //}
+                //
+                //nested = engine.constructNestedObject(undef, undef[undef.length - 1], value, containArray, Array.isArray(property), arrIndex)
 
                 reverse(o)
             }
