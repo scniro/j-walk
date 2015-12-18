@@ -134,101 +134,52 @@ function jw(o) {
     function set(o, query, value) {
 
         var tree = engine.parseQuery(query)
-        var identified, nested, last;
         var exists = [];
 
-        //function reverse(obj) {
-        //
-        //    var property = exists.shift();
-        //
-        //    if (exists.length > 0) {
-        //        for (var key in obj) {
-        //            if (Array.isArray(property)) {
-        //                for (var i = 0; i < obj.length; i += 1) {
-        //                    var keys = Object.keys(obj[i])
-        //
-        //                    if (keys[0] === property[0]) {
-        //                        return reverse(obj[key][property[0]])
-        //                    }
-        //                }
-        //            } else {
-        //                if (key === property) {
-        //                    return reverse(obj[property])
-        //                }
-        //            }
-        //        }
-        //    } else {
-        //
-        //
-        //
-        //        if (nested) {
-        //
-        //
-        //            if(identified) {
-        //
-        //                if(Array.isArray(obj[identified])) {
-        //
-        //
-        //
-        //                    console.log('1')
-        //                    return obj[identified].push(nested)
-        //                } else {
-        //                    console.log('2')
-        //                    return obj[identified][last] = nested[last]
-        //                }
-        //
-        //
-        //                //return obj[identified][last] = nested[last]
-        //            } else {
-        //
-        //
-        //                console.log('3')
-        //                obj[last] = nested[last]
-        //            }
-        //        } else {
-        //            console.log('4')
-        //            return obj[identified] = value
-        //        }
-        //    }
-        //}
-
-        function traverse(obj, value) {
+        function walk(obj, value) {
 
             var property = tree.shift();
 
-            if(obj.hasOwnProperty(property)) {
+            if (obj.hasOwnProperty(property) && !Array.isArray(obj) && tree.length > 0) {
                 exists.push(property)
-                traverse(obj[property], value)
+                if(tree.length !== 0){
+                    walk(obj[property], value)
+                }
             } else {
-                if(Array.isArray(obj)) {
+                if (Array.isArray(obj)) {
 
                     var identifier = property[0].split('=')[0]
                     var identifierKey = property[0].split('=')[1]
 
-                    for(var i = 0; i < obj.length; i += 1) {
-                        if(obj[i][identifier] == identifierKey) {
+                    for (var i = 0; i < obj.length; i += 1) {
+                        if (obj[i][identifier] == identifierKey) {
 
                             var suppliedKeys = Object.keys(value)
 
-                            if(tree.length !== 0) {
+                            if (tree.length !== 0) {
                                 exists.push(property)
-                                return traverse(obj[i], value)
+
+                                return walk(obj[i], value)
                             } else {
-                                for(var o = 0; o < suppliedKeys.length; o += 1) {
+                                for (var o = 0; o < suppliedKeys.length; o += 1) {
                                     obj[i][suppliedKeys[o]] = value[suppliedKeys[o]]
                                 }
                             }
                         }
                     }
-                }  else {
+                } else {
 
                     var undefined = [];
                     var reference = engine.parseQuery(query);
 
                     function nest(constructed, value) {
+
                         var property = undefined.shift()
 
-                        if(property && undefined.length > 0) {
+                        if (!property)
+                            return null
+
+                        if (property && undefined.length > 0) {
                             constructed[property] = {}
                             nest(constructed[property], value)
                         } else {
@@ -243,12 +194,24 @@ function jw(o) {
                     });
 
                     var nested = nest({}, value)
-                    obj[property] = nested[property]
+
+                    if (nested) {
+
+                        obj[property] = nested[property]
+                        console.log(nested)
+
+                    }
+                    else {
+
+
+                       console.log(obj)
+
+                    }
                 }
             }
         }
 
-        traverse(o, value)
+        walk(o, value)
     }
 
     this.get = function (query) {

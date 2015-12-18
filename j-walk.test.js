@@ -228,10 +228,11 @@ describe('j-walk tests:get:array', function () {
             'root': {
                 'parent-a': [
                     {'child-a': {}},
-                    {'child-b': [
-                        {'grandchild-a': 21},
-                        {'grandchild-b': 42},
-                        {'grandchild-c': 84}]
+                    {
+                        'child-b': [
+                            {'grandchild-a': 21},
+                            {'grandchild-b': 42},
+                            {'grandchild-c': 84}]
                     }],
                 'parent-b': {}
             }
@@ -330,7 +331,7 @@ describe('j-walk tests:set', function () {
         jw(base).set('root.sub', 42)
 
         base.root.sub.should.equal(42);
-       base.root.ignored.should.equal(84);
+        base.root.ignored.should.equal(84);
     });
 
     it('should set the deeply nested value: 42. object - pre-defined target property. defined sibling. ignore sibling value of 84', function () {
@@ -403,9 +404,152 @@ describe('j-walk tests:set', function () {
     });
 });
 
-describe('j-walk tests:set:array', function (){
+describe('j-walk tests:set:array', function () {
 
-    // todo
+    it('should set array value - specified by id. single defined property.', function () {
+
+        var base = {
+            'root': [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 30}]
+        }
+
+        jw(base).set('root.[id=2]', {value: 42})
+
+        base.root[1].value.should.equal(42)
+    });
+
+    it('should set array value - specified by id. single defined property. ignore sibling value.', function () {
+
+        var base = {
+            'root': [{id: 1, value: 10, secondary: 'a'}, {id: 2, value: 20, secondary: 'b'}, {
+                id: 3,
+                value: 30,
+                secondary: 'c'
+            }]
+        };
+
+        jw(base).set('root.[id=2]', {value: 42});
+
+        base.root[1].value.should.equal(42);
+        base.root[1].secondary.should.equal('b');
+    });
+
+    it('should set array value - specified by id. multiple defined properties', function () {
+
+        var base = {
+            'root': [{id: 1, value: 10, secondary: 'a'}, {id: 2, value: 20, secondary: 'b'}, {
+                id: 3,
+                value: 30,
+                secondary: 'c'
+            }]
+        };
+
+        jw(base).set('root.[id=2]', {value: 42, secondary: 'foo'});
+
+        base.root[1].value.should.equal(42);
+        base.root[1].secondary.should.equal('foo');
+    });
+
+    it('should set array value - specified by id. multiple undefined properties', function () {
+
+        var base = {
+            'root': [{id: 1}, {id: 2}, {id: 3}]
+        };
+
+        jw(base).set('root.[id=2]', {value: 42, secondary: 'foo'});
+
+        base.root[1].value.should.equal(42);
+        base.root[1].secondary.should.equal('foo');
+    });
+
+    it('should set array value - specified by id. single, undefined property.', function () {
+
+        var base = {
+            'root': [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 30}]
+        };
+
+        jw(base).set('root.[id=2]', {secondary: 'foo'});
+
+        base.root[1].secondary.should.equal('foo');
+    });
+
+    it('should set array value - specified by id. single, undefined property. ignore sibling.', function () {
+
+        var base = {
+            'root': [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 30}]
+        };
+
+        jw(base).set('root.[id=2]', {secondary: 'foo'});
+
+        base.root[1].value.should.equal(20);
+        base.root[1].secondary.should.equal('foo');
+    });
+
+    it('should set array value - specified by id. undefined nested object value.', function () {
+
+        var base = {
+            'root': [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 30}]
+        };
+
+        jw(base).set('root.[id=2]', {secondary: {inner: 'bar'}});
+
+        base.root[1].secondary.inner.should.equal('bar');
+    });
+
+    it('should set array value - specified by id. defined empty nested object value.', function () {
+
+        var base = {
+            'root': [{id: 1, value: 10}, {id: 2, value: 20, secondary: {inner: 'foo'}}, {id: 3, value: 30}]
+        };
+
+        jw(base).set('root.[id=2]', {secondary: {inner: 'bar'}});
+
+        base.root[1].secondary.inner.should.equal('bar');
+    });
+
+    it('should set array value - specified by id. defined empty nested object value. ignore sibling.', function () {
+
+        var base = {
+            'root': [{id: 1, value: 10}, {id: 2, value: 20, secondary: {inner: 'foo'}}, {id: 3, value: 30}]
+        };
+
+        jw(base).set('root.[id=2]', {secondary: {inner: 'bar'}});
+
+        base.root[1].value.should.equal(20);
+        base.root[1].secondary.inner.should.equal('bar');
+    });
+
+    it('should set object value - mid array selector specified by id. immediate undefined object target. simple value', function () {
+
+        var base = {
+            'root': [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 30}]
+        };
+
+        jw(base).set('root.[id=2].sub', 42);
+
+        base.root[1].sub.should.equal(42);
+    });
+
+    it('should set object value - mid array selector specified by id. immediate undefined object target. object value', function () {
+
+        var base = {
+            'root': [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 30}]
+        };
+
+        jw(base).set('root.[id=2].sub', {'property': 42});
+
+        base.root[1].sub.property.should.equal(42);
+    });
+
+    it('should set object value - mid array selector specified by id. immediate defined object target. simple value', function () {
+
+        var base = {
+            'root': [{id: 1, value: 10}, {id: 2, value: 20, sub: 2}, {id: 3, value: 30}]
+        };
+
+        jw(base).set('root.[id=2].sub', 42);
+
+        base.root[1].sub.should.equal(42);
+    });
 });
 
 describe('j-walk tests:exists', function () {
@@ -496,7 +640,10 @@ describe('j-walk tests:engine', function () {
 
     it('should create a nested object - initialize target value with empty object', function () {
 
-        var criteria = [{'property': 'root',  'isArray': false}, {'property': 'sub',  'isArray': false}, {'property': 'nested',  'isArray': false}]
+        var criteria = [{'property': 'root', 'isArray': false}, {
+            'property': 'sub',
+            'isArray': false
+        }, {'property': 'nested', 'isArray': false}]
 
         var expected = {
             'root': {
@@ -513,7 +660,10 @@ describe('j-walk tests:engine', function () {
 
     it('should create a nested object - initialize object with target property and value: [nested]:42', function () {
 
-        var criteria = [{'property': 'root',  'isArray': false}, {'property': 'sub',  'isArray': false}, {'property': 'nested',  'isArray': false}]
+        var criteria = [{'property': 'root', 'isArray': false}, {
+            'property': 'sub',
+            'isArray': false
+        }, {'property': 'nested', 'isArray': false}]
 
         var expected = {
             'root': {
