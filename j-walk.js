@@ -131,7 +131,7 @@ function jw(o) {
         return exists;
     }
 
-    function set(o, query, value) {
+    function set(o, query, value, create) {
 
         var tree = engine.parseQuery(query)
         var exists = [];
@@ -152,20 +152,35 @@ function jw(o) {
                     var identifierKey = property[0].split('=')[1]
 
                     for (var i = 0; i < obj.length; i += 1) {
+                        var found = false;
                         if (obj[i][identifier] == identifierKey) {
-
+                            found = true;
                             var suppliedKeys = Object.keys(value)
-
                             if (tree.length !== 0) {
                                 exists.push(property)
 
                                 return walk(obj[i], value)
                             } else {
                                 for (var o = 0; o < suppliedKeys.length; o += 1) {
-                                    obj[i][suppliedKeys[o]] = value[suppliedKeys[o]]
+                                    obj[i][suppliedKeys[o]] = value[suppliedKeys[o]];
                                 }
                             }
                         }
+                    }
+
+                    if(!found && create) {
+
+                        // alphabetize and reuse
+                        var identifier = property[0].split('=')[0]
+                        var identifierKey = property[0].split('=')[1]
+
+                        value[identifier] = identifierKey
+
+
+                        obj.push(value)
+
+                        //console.log(obj)
+
                     }
                 } else {
 
@@ -218,8 +233,8 @@ function jw(o) {
         return get(o, query);
     }
 
-    this.set = function (query, value) {
-        return set(o, query, value)
+    this.set = function (query, value, create) {
+        return set(o, query, value, create)
     }
 
     this.exists = function (query) {

@@ -550,6 +550,43 @@ describe('j-walk tests:set:array', function () {
 
         base.root[1].sub.should.equal(42);
     });
+
+    it('should set array value - traverse multiple specified arrays. defined object target.', function () {
+
+        var base = {
+            'root': [
+                {id: 1, value: 10},
+                {id: 2, value: 20, sub: [
+                    {id: 'sub1', value: 'a'},
+                    {id: 'sub2', value: 'b'},
+                    {id: 'sub3', value: 'c'}
+                ]},
+                {id: 3, value: 30}]
+        };
+
+        jw(base).set('root.[id=2].sub.[id=sub2]', { value: 'foo' });
+
+        base.root[1].sub[1].value.should.equal('foo');
+    });
+
+    it('should set array value - traverse multiple specified arrays. undefined object target. ignore siblings', function () {
+
+        var base = {
+            'root': [
+                {id: 1, value: 10},
+                {id: 2, value: 20, sub: [
+                    {id: 'sub1', value: 'a'},
+                    {id: 'sub2', value: 'b'},
+                    {id: 'sub3', value: 'c'}
+                ]},
+                {id: 3, value: 30}]
+        };
+
+        jw(base).set('root.[id=2].sub.[id=sub2]', { other: 'bar' });
+
+        base.root[1].sub[1].value.should.equal('b');
+        base.root[1].sub[1].other.should.equal('bar');
+    });
 });
 
 describe('j-walk tests:exists', function () {
