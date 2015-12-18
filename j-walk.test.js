@@ -1,7 +1,7 @@
 var chai = require('chai');
 var expect = chai.expect;
 var jw = require('./j-walk.js').jw;
-var engine = new require('./j-walk.js').jwEngine();
+var jwHelper = new require('./j-walk.js').jwHelper();
 var exception = require('./j-walk.js').jwException;
 
 chai.should();
@@ -279,7 +279,6 @@ describe('j-walk tests:set', function () {
         var base = {};
 
         jw(base).set('root', 42)
-
         base.root.should.equal(42);
     });
 
@@ -287,7 +286,6 @@ describe('j-walk tests:set', function () {
         var base = {};
 
         jw(base).set('root.nested', 42)
-
         base.root.nested.should.equal(42);
     });
 
@@ -295,7 +293,6 @@ describe('j-walk tests:set', function () {
         var base = {};
 
         jw(base).set('root.nested.sub', 42);
-
         base.root.nested.sub.should.equal(42);
     });
 
@@ -305,7 +302,6 @@ describe('j-walk tests:set', function () {
         };
 
         jw(base).set('root.nested', 42);
-
         base.root.nested.should.equal(42);
     });
 
@@ -317,7 +313,6 @@ describe('j-walk tests:set', function () {
         };
 
         jw(base).set('root.nested.sub', 42);
-
         base.root.nested.sub.should.equal(42);
     });
 
@@ -330,9 +325,8 @@ describe('j-walk tests:set', function () {
         };
 
         jw(base).set('root.sub', 42)
-
         base.root.sub.should.equal(42);
-        // base.root.ignored.should.equal(84);
+        base.root.ignored.should.equal(84);
     });
 
     it('should set the deeply nested value: 42. object - pre-defined target property. defined sibling. ignore sibling value of 84', function () {
@@ -346,9 +340,8 @@ describe('j-walk tests:set', function () {
         };
 
         jw(base).set('root.sub.inner', 42)
-
         base.root.sub.inner.should.equal(42);
-        //base.root.ignored.should.equal(84);
+        base.root.ignored.should.equal(84);
     });
 
     it('should set the immediate nested value: 42. object - pre-defined target property. defined sibling. ignore sibling value of 84', function () {
@@ -359,7 +352,6 @@ describe('j-walk tests:set', function () {
         };
 
         jw(base).set('root.sub', 42)
-
         base.root.sub.should.equal(42);
         base.root.ignored.should.equal(84);
     });
@@ -372,7 +364,6 @@ describe('j-walk tests:set', function () {
         };
 
         jw(base).set('root.sub.inner', 42)
-
         base.root.sub.inner.should.equal(42);
         base.root.ignored.should.equal(84);
     });
@@ -384,12 +375,9 @@ describe('j-walk tests:set', function () {
             }
         };
 
-        var value = {
-            val: 42
-        }
+        var value = {val: 42}
 
         jw(base).set('root.sub', value)
-
         base.root.sub.should.deep.equal(value);
         base.root.ignored.should.equal(84);
     });
@@ -400,35 +388,24 @@ describe('j-walk tests:set', function () {
                 ignored: 84
             }
         };
-
         var value = {
-            nested: {
-                val: 42
-            }
+            nested: {val: 42}
         }
 
         jw(base).set('root.sub', value)
-
         base.root.sub.should.deep.equal(value);
         base.root.ignored.should.equal(84);
     });
 
     it('should set the immediate nested value: [object]. object - pre-defined target property. defined sibling. ignore sibling value of 84', function () {
         var base = {
-            root: {
-                ignored: 84
-            },
-            sub: {
-                val: {}
-            }
+            root: {ignored: 84},
+            sub: {val: {}}
         };
 
-        var value = {
-            val: 42
-        }
+        var value = {val: 42}
 
         jw(base).set('root.sub', value)
-
         base.root.sub.should.deep.equal(value);
         base.root.ignored.should.equal(84);
     });
@@ -441,9 +418,7 @@ describe('j-walk tests:set:array', function () {
         var base = {
             'root': [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 30}]
         }
-
-        jw(base).set('root.[id=2]', {value: 42})
-
+        jw(base).set('root.[id=2]', {value: 42});
         base.root[1].value.should.equal(42)
     });
 
@@ -458,7 +433,6 @@ describe('j-walk tests:set:array', function () {
         };
 
         jw(base).set('root.[id=2]', {value: 42});
-
         base.root[1].value.should.equal(42);
         base.root[1].secondary.should.equal('b');
     });
@@ -474,7 +448,6 @@ describe('j-walk tests:set:array', function () {
         };
 
         jw(base).set('root.[id=2]', {value: 42, secondary: 'foo'});
-
         base.root[1].value.should.equal(42);
         base.root[1].secondary.should.equal('foo');
     });
@@ -486,7 +459,6 @@ describe('j-walk tests:set:array', function () {
         };
 
         jw(base).set('root.[id=2]', {value: 42, secondary: 'foo'});
-
         base.root[1].value.should.equal(42);
         base.root[1].secondary.should.equal('foo');
     });
@@ -498,7 +470,6 @@ describe('j-walk tests:set:array', function () {
         };
 
         jw(base).set('root.[id=2]', {secondary: 'foo'});
-
         base.root[1].secondary.should.equal('foo');
     });
 
@@ -509,7 +480,6 @@ describe('j-walk tests:set:array', function () {
         };
 
         jw(base).set('root.[id=2]', {secondary: 'foo'});
-
         base.root[1].value.should.equal(20);
         base.root[1].secondary.should.equal('foo');
     });
@@ -521,7 +491,6 @@ describe('j-walk tests:set:array', function () {
         };
 
         jw(base).set('root.[id=2]', {secondary: {inner: 'bar'}});
-
         base.root[1].secondary.inner.should.equal('bar');
     });
 
@@ -532,7 +501,6 @@ describe('j-walk tests:set:array', function () {
         };
 
         jw(base).set('root.[id=2]', {secondary: {inner: 'bar'}});
-
         base.root[1].secondary.inner.should.equal('bar');
     });
 
@@ -543,7 +511,6 @@ describe('j-walk tests:set:array', function () {
         };
 
         jw(base).set('root.[id=2]', {secondary: {inner: 'bar'}});
-
         base.root[1].value.should.equal(20);
         base.root[1].secondary.inner.should.equal('bar');
     });
@@ -555,7 +522,6 @@ describe('j-walk tests:set:array', function () {
         };
 
         jw(base).set('root.[id=2].sub', 42);
-
         base.root[1].sub.should.equal(42);
     });
 
@@ -566,7 +532,6 @@ describe('j-walk tests:set:array', function () {
         };
 
         jw(base).set('root.[id=2].sub', {'property': 42});
-
         base.root[1].sub.property.should.equal(42);
     });
 
@@ -577,7 +542,6 @@ describe('j-walk tests:set:array', function () {
         };
 
         jw(base).set('root.[id=2].sub', 42);
-
         base.root[1].sub.should.equal(42);
     });
 
@@ -597,7 +561,6 @@ describe('j-walk tests:set:array', function () {
         };
 
         jw(base).set('root.[id=2].sub.[id=sub2]', {value: 'foo'});
-
         base.root[1].sub[1].value.should.equal('foo');
     });
 
@@ -617,7 +580,6 @@ describe('j-walk tests:set:array', function () {
         };
 
         jw(base).set('root.[id=2].sub.[id=sub2]', {other: 'bar'});
-
         base.root[1].sub[1].value.should.equal('b');
         base.root[1].sub[1].other.should.equal('bar');
     });
@@ -627,7 +589,6 @@ describe('j-walk tests:exists', function () {
 
     it('should return:true - defined property', function () {
         var base = {'root': null};
-
         jw(base).exists('root').should.be.true;
     });
 
@@ -639,7 +600,6 @@ describe('j-walk tests:exists', function () {
                 }
             }
         };
-
         jw(base).exists('root.nested.deeper').should.be.true;
     });
 
@@ -652,7 +612,6 @@ describe('j-walk tests:exists', function () {
                 'sibling': {}
             }
         };
-
         jw(base).exists('root.sibling').should.be.true;
     });
 
@@ -679,7 +638,6 @@ describe('j-walk tests:exists', function () {
 });
 
 describe('j-walk tests:exists:array', function () {
-
 
     it('should return: true - base array with existing target object. whole object exists', function () {
         var base = {
@@ -758,26 +716,26 @@ describe('j-walk tests:exists:array', function () {
     });
 });
 
-describe('j-walk tests:engine', function () {
+describe('j-walk tests:jwHelper', function () {
 
     it('should parse the dot notation selector query:single value', function () {
         var query = 'root'
         var expected = ['root']
-        var actual = engine.parseQuery(query)
+        var actual = jwHelper.parseQuery(query)
         actual.should.deep.equal(expected);
     });
 
     it('should parse the dot notation selector query:nested', function () {
         var query = 'root.sub.nested'
         var expected = ['root', 'sub', 'nested']
-        var actual = engine.parseQuery(query)
+        var actual = jwHelper.parseQuery(query)
         actual.should.deep.equal(expected);
     });
 
     it('should parse the dot notation selector query:single array', function () {
         var query = 'root.sub.[sub-a].nested'
         var expected = ['root', 'sub', ['sub-a'], 'nested']
-        var actual = engine.parseQuery(query)
+        var actual = jwHelper.parseQuery(query)
 
         actual.should.deep.equal(expected);
     });
@@ -785,33 +743,33 @@ describe('j-walk tests:engine', function () {
     it('should parse the dot notation selector query:nested array', function () {
         var query = 'root.sub.[sub-a].nested.[sub-b].last'
         var expected = ['root', 'sub', ['sub-a'], 'nested', ['sub-b'], 'last']
-        var actual = engine.parseQuery(query)
+        var actual = jwHelper.parseQuery(query)
         actual.should.deep.equal(expected);
     });
 
     it('should throw exception: jwException - unable to parse selector query for invalid criteria', function () {
         expect(function () {
-            engine.parseQuery(42)
+            jwHelper.parseQuery(42)
         }).to.throw(new exception('j-walk: invalid selector query format. expected: string'));
 
         expect(function () {
-            engine.parseQuery('')
+            jwHelper.parseQuery('')
         }).to.throw(new exception('j-walk: invalid selector query format. expected: string'));
 
         expect(function () {
-            engine.parseQuery({})
+            jwHelper.parseQuery({})
         }).to.throw(new exception('j-walk: invalid selector query format. expected: string'));
 
         expect(function () {
-            engine.parseQuery(undefined)
+            jwHelper.parseQuery(undefined)
         }).to.throw(new exception('j-walk: invalid selector query format. expected: string'));
 
         expect(function () {
-            engine.parseQuery(null)
+            jwHelper.parseQuery(null)
         }).to.throw(new exception('j-walk: invalid selector query format. expected: string'));
 
         expect(function () {
-            engine.parseQuery(['a', 'b', 'c'])
+            jwHelper.parseQuery(['a', 'b', 'c'])
         }).to.throw(new exception('j-walk: invalid selector query format. expected: string'));
     });
 });

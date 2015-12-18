@@ -4,19 +4,21 @@ function jwException(message) {
     this.message = message;
 }
 
-function jwEngine() {
+function jwHelper() {
 
     function constructNestedObject(map, value) {
 
         function merge(obj1, obj2) {
-            var obj3 = {};
-            for (var attrname in obj1) {
-                obj3[attrname] = obj1[attrname];
+
+            var built = {};
+
+            for (var attr in obj1) {
+                built[attr] = obj1[attr];
             }
-            for (var attrname in obj2) {
-                obj3[attrname] = obj2[attrname];
+            for (var attr in obj2) {
+                built[attr] = obj2[attr];
             }
-            return obj3;
+            return built;
         }
 
         function nest(constructed, propArray, value, queryProperties) {
@@ -32,11 +34,9 @@ function jwEngine() {
             } else {
                 if (Array.isArray(constructed)) {
                     var merged = merge(value, queryProperties)
-                    constructed.push(merged) // value
-
-                } else {
+                    constructed.push(merged)
+                } else
                     constructed[p['property']] = value
-                }
             }
 
             return constructed;
@@ -55,27 +55,23 @@ function jwEngine() {
             var push = {'property': null, 'isArray': false, value: null}
 
             if (Array.isArray(x)) {
-
                 var p = x[0].split('=')[0]
                 var v = x[0].split('=')[1]
-
                 queryProperties[p] = v
                 push.property = p;
 
-            } else {
+            } else
                 push.property = x
-            }
 
             undefined.push(push)
 
-            if (Array.isArray(x) && undefined.length > 1) {
+            if (Array.isArray(x) && undefined.length > 1)
                 undefined[undefined.length - 2].isArray = true;
-            }
         });
 
         var map = {
-            'undefined': undefined,
-            'queryProperties': queryProperties
+            'queryProperties': queryProperties,
+            'undefined': undefined
         }
 
         return map;
@@ -98,7 +94,7 @@ function jwEngine() {
             }
         }
 
-        return tree;
+        return tree || [];
     }
 
     return {
@@ -112,45 +108,7 @@ function jw(o) {
     if (!o || typeof o !== 'object')
         throw new jwException('j-walk: invalid selector. expected: object')
 
-    function get(o, query) {
-
-        var tree = engine.parseQuery(query)
-        var found;
-
-        function find(o) {
-            var property = tree.shift();
-
-            if (Array.isArray(property)) {
-
-                var interest = tree.shift();
-                var key = property[0].split('=')[0]
-                var keyValue = property[0].split('=')[1]
-
-                for (var i = 0; i < o.length; i += 1) {
-
-                    if (o[i][key] == keyValue) {
-                        if (tree.length > 0) {
-                            return find(o[i][interest])
-                        } else {
-                            found = o[i][interest];
-                            return;
-                        }
-                    }
-                }
-
-            } else {
-                if (o.hasOwnProperty(property) && tree.length > 0) {
-                    return find(o[property])
-                } else {
-                    found = o[property]
-                    return;
-                }
-            }
-        }
-
-        find(o)
-        return found;
-    }
+    var self = this;
 
     function exists(o, query) {
 
@@ -163,40 +121,49 @@ function jw(o) {
             if (o.hasOwnProperty(property) && tree.length > 0) {
                 find(o[property])
             } else {
-
                 if (Array.isArray(o)) {
-
                     var interest = tree.shift();
                     var key = property[0].split('=')[0]
                     var keyValue = property[0].split('=')[1]
-
                     for (var i = 0; i < o.length; i += 1) {
-
                         if (o[i][key] == keyValue) {
-
-                            if (interest) {
-                                if (tree.length > 0) {
-                                    return find(o[i][interest])
-                                } else {
-                                    exists = o[i].hasOwnProperty(interest)
-                                    return;
-                                }
-                            } else {
-                                exists = true;
-                                return;
-                            }
+                            if (interest)
+                                return tree.length > 0 ? find(o[i][interest]) : exists = o[i].hasOwnProperty(interest)
+                            else
+                                return exists = true;
                         }
                     }
-
-                } else {
-                    exists = o.hasOwnProperty(property)
-                    return;
-                }
+                } else
+                    return exists = o.hasOwnProperty(property)
             }
         }
 
         find(o)
         return exists;
+    }
+
+    function get(o, query) {
+
+        var tree = engine.parseQuery(query)
+        var found;
+
+        function find(o) {
+            var property = tree.shift();
+
+            if (Array.isArray(property)) {
+                var interest = tree.shift();
+                var key = property[0].split('=')[0]
+                var keyValue = property[0].split('=')[1]
+                for (var i = 0; i < o.length; i += 1) {
+                    if (o[i][key] == keyValue)
+                        return tree.length > 0 ? find(o[i][interest]) : found = o[i][interest]
+                }
+            } else
+                return o.hasOwnProperty(property) && tree.length > 0 ? find(o[property]) : found = o[property]
+        }
+
+        find(o)
+        return found;
     }
 
     function set(o, query, value) {
@@ -235,7 +202,6 @@ function jw(o) {
                 } else {
                     var nestedMapping = engine.getNestedMapping(engine.parseQuery(query), exists)
                     var nested = engine.constructNestedObject(nestedMapping, value)
-
                     if (nested)
                         obj[property] = nested[property]
                 }
@@ -245,23 +211,23 @@ function jw(o) {
         walk(o, value)
     }
 
-    this.get = function (query) {
-        return get(o, query);
-    }
-
-    this.set = function (query, value) {
-        return set(o, query, value)
-    }
-
-    this.exists = function (query) {
+    self.exists = function (query) {
         return exists(o, query)
     }
 
-    return this;
+    self.get = function (query) {
+        return get(o, query);
+    }
+
+    self.set = function (query, value) {
+        return set(o, query, value)
+    }
+
+    return self;
 }
 
-var engine = new jwEngine();
+var engine = new jwHelper();
 
 module.exports.jw = jw;
-module.exports.jwEngine = jwEngine;
+module.exports.jwHelper = jwHelper;
 module.exports.jwException = jwException;
