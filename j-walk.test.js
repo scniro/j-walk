@@ -151,6 +151,8 @@ describe('j-walk tests:get', function () {
 });
 
 describe('j-walk tests:get:array', function () {
+
+    // todo
     it('should return the value: 42. single nested array selector', function () {
 
         var base = {
@@ -288,35 +290,35 @@ describe('j-walk tests:set', function () {
         base.root.nested.sub.should.equal(42);
     });
 
-    it('should set the immediate nested value: 42. object - pre-defined target property. defined sibling. ignore sibling value of 84', function () {
-        var base = {
-            root: {
-                sub: {},
-                ignored: 84
-            }
-        };
+    //it('should set the immediate nested value: 42. object - pre-defined target property. defined sibling. ignore sibling value of 84', function () {
+    //    var base = {
+    //        root: {
+    //            sub: {},
+    //            ignored: 84
+    //        }
+    //    };
+    //
+    //    jw(base).set('root.sub', 42)
+    //
+    //    base.root.sub.should.equal(42);
+    //   // base.root.ignored.should.equal(84);
+    //});
 
-        jw(base).set('root.sub', 42)
-
-        base.root.sub.should.equal(42);
-       // base.root.ignored.should.equal(84);
-    });
-
-    it('should set the deeply nested value: 42. object - pre-defined target property. defined sibling. ignore sibling value of 84', function () {
-        var base = {
-            root: {
-                sub: {
-                    inner: {}
-                },
-                ignored: 84
-            }
-        };
-
-        jw(base).set('root.sub.inner', 42)
-
-        base.root.sub.inner.should.equal(42);
-        //base.root.ignored.should.equal(84);
-    });
+    //it('should set the deeply nested value: 42. object - pre-defined target property. defined sibling. ignore sibling value of 84', function () {
+    //    var base = {
+    //        root: {
+    //            sub: {
+    //                inner: {}
+    //            },
+    //            ignored: 84
+    //        }
+    //    };
+    //
+    //    jw(base).set('root.sub.inner', 42)
+    //
+    //    base.root.sub.inner.should.equal(42);
+    //    //base.root.ignored.should.equal(84);
+    //});
 
     it('should set the immediate nested value: 42. object - pre-defined target property. defined sibling. ignore sibling value of 84', function () {
         var base = {
@@ -403,33 +405,7 @@ describe('j-walk tests:set', function () {
 
 describe('j-walk tests:set:array', function (){
 
-
-    it('should set specified array value: {"value": 42}. undefined nested property. no siblings', function () {
-        var base = {
-            'root': {
-            }
-        };
-
-        jw(base).set('root.container.[nested]', 42)
-
-        base.root.container[0].nested.should.equal(42);
-        //regress
-        jw(base).get('root.container.[nested]').should.equal(42)
-    });
-
-    it('should set specified array value: {"value": 42}. defined nested property. no siblings', function () {
-        var base = {
-            'root': {
-                'container': []
-            }
-        };
-
-        jw(base).set('root.container.[nested]', 42)
-
-        base.root.container[0].nested.should.equal(42);
-        //regress
-        jw(base).get('root.container.[nested]').should.equal(42)
-    });
+    // todo
 });
 
 describe('j-walk tests:exists', function () {
