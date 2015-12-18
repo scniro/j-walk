@@ -6,45 +6,44 @@ function jwException(message) {
 
 function jwEngine() {
 
-    function constructNestedObject(propArr, value) {
+    function constructNestedObject(propArray, value, queryProperties) {
 
-        var built = {};
+        function merge(obj1, obj2){
+            var obj3 = {};
+            for (var attrname in obj1) { obj3[attrname] = obj1[attrname]; }
+            for (var attrname in obj2) { obj3[attrname] = obj2[attrname]; }
+            return obj3;
+        }
 
-        function nest(o) {
+        function nest(constructed, propArray, value, queryProperties) {
 
-            console.log(propArr)
+            var p = propArray.shift()
 
-            if (propArr.length === 0)
-                return;
+            if (!p)
+                return null
 
-            var property = propArr.shift();
-
-
-            if (propArr.length === 0) {
-                if (Array.isArray(o)) {
-                    var push = {}
-                    push[property['property']] = value ? value : {}
-
-                    o.push(push)
-
-                } else {
-
-                    o[property['property']] = value ? value : {};
-                }
+            if (p && propArray.length > 0) {
+                constructed[p['property']] = p.isArray ? [] : {}
+                nest(constructed[p['property']], propArray, value, queryProperties)
             } else {
-                if (property['isArray']) {
-                    o[property['property']] = []
+                if (Array.isArray(constructed)) {
+                    var merged = merge(value, queryProperties)
+
+
+                    constructed.push(merged) // value
                 } else {
-                    o[property['property']] = {}
+                    constructed[p['property']] = value
                 }
             }
 
-            nest(o[property['property']])
+            return constructed;
         }
 
-        nest(built)
+        return nest({}, propArray, value, queryProperties);
+    }
 
-        return Object.keys(built).length > 0 ? built : null;
+    function getUndefinedMap() {
+
     }
 
     function parseQuery(criteria) {
@@ -142,7 +141,7 @@ function jw(o) {
 
             if (obj.hasOwnProperty(property) && !Array.isArray(obj) && tree.length > 0) {
                 exists.push(property)
-                if(tree.length !== 0){
+                if (tree.length !== 0) {
                     walk(obj[property], value)
                 }
             } else {
@@ -152,6 +151,9 @@ function jw(o) {
                     var identifierKey = property[0].split('=')[1]
 
                     for (var i = 0; i < obj.length; i += 1) {
+
+
+
                         var found = false;
                         if (obj[i][identifier] == identifierKey) {
                             found = true;
@@ -161,6 +163,7 @@ function jw(o) {
 
                                 return walk(obj[i], value)
                             } else {
+
                                 for (var o = 0; o < suppliedKeys.length; o += 1) {
                                     obj[i][suppliedKeys[o]] = value[suppliedKeys[o]];
                                 }
@@ -168,59 +171,65 @@ function jw(o) {
                         }
                     }
 
-                    if(!found && create) {
+                    if (!found && create) {
 
-                        // alphabetize and reuse
                         var identifier = property[0].split('=')[0]
                         var identifierKey = property[0].split('=')[1]
 
                         value[identifier] = identifierKey
 
+                        console.log(obj)
 
                         obj.push(value)
 
-                        //console.log(obj)
-
+                        //if(tree.length > 0) {
+                        //    return walk(obj[0], value)
+                        //}
                     }
                 } else {
 
                     var undefined = [];
                     var reference = engine.parseQuery(query);
 
-                    function nest(constructed, value) {
 
-                        var property = undefined.shift()
 
-                        if (!property)
-                            return null
 
-                        if (property && undefined.length > 0) {
-                            constructed[property] = {}
-                            nest(constructed[property], value)
-                        } else {
-                            constructed[property] = value
-                        }
+                    var queryProperties = {}
 
-                        return constructed;
-                    }
+                    var baseArray = false;
 
                     reference.slice(exists.length, reference.length).forEach(function (x) {
-                        undefined.push(x)
+
+                        var push = {'property': null, 'isArray': false, value: null}
+
+                        if (Array.isArray(x)) {
+
+                            var p = x[0].split('=')[0]
+                            var v = x[0].split('=')[1]
+
+                            queryProperties[p] = v
+                            push.property = p;
+
+                        } else {
+                            push.property = x
+                        }
+
+                        undefined.push(push)
+
+                        if (Array.isArray(x) && undefined.length > 1) {
+                            undefined[undefined.length - 2].isArray = true;
+                        } else if(Array.isArray(x) && undefined.length === 1) {
+                            baseArray = true;
+                            undefined[undefined.length - 1].isArray = true;
+                        }
                     });
 
-                    var nested = nest({}, value)
+                    var nested = engine.constructNestedObject(undefined, value, queryProperties)
 
                     if (nested) {
-
                         obj[property] = nested[property]
-                        console.log(nested)
-
                     }
                     else {
-
-
-                       console.log(obj)
-
                     }
                 }
             }
