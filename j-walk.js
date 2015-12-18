@@ -6,12 +6,16 @@ function jwException(message) {
 
 function jwEngine() {
 
-    function constructNestedObject(propArray, value, queryProperties) {
+    function constructNestedObject(map, value) {
 
-        function merge(obj1, obj2){
+        function merge(obj1, obj2) {
             var obj3 = {};
-            for (var attrname in obj1) { obj3[attrname] = obj1[attrname]; }
-            for (var attrname in obj2) { obj3[attrname] = obj2[attrname]; }
+            for (var attrname in obj1) {
+                obj3[attrname] = obj1[attrname];
+            }
+            for (var attrname in obj2) {
+                obj3[attrname] = obj2[attrname];
+            }
             return obj3;
         }
 
@@ -28,9 +32,8 @@ function jwEngine() {
             } else {
                 if (Array.isArray(constructed)) {
                     var merged = merge(value, queryProperties)
-
-
                     constructed.push(merged) // value
+
                 } else {
                     constructed[p['property']] = value
                 }
@@ -39,11 +42,43 @@ function jwEngine() {
             return constructed;
         }
 
-        return nest({}, propArray, value, queryProperties);
+        return nest({}, map.undefined, value, map.queryProperties);
     }
 
-    function getUndefinedMap() {
+    function getNestedMapping(query, identified) {
 
+        var undefined = [];
+        var queryProperties = {};
+
+        query.slice(identified.length, query.length).forEach(function (x) {
+
+            var push = {'property': null, 'isArray': false, value: null}
+
+            if (Array.isArray(x)) {
+
+                var p = x[0].split('=')[0]
+                var v = x[0].split('=')[1]
+
+                queryProperties[p] = v
+                push.property = p;
+
+            } else {
+                push.property = x
+            }
+
+            undefined.push(push)
+
+            if (Array.isArray(x) && undefined.length > 1) {
+                undefined[undefined.length - 2].isArray = true;
+            }
+        });
+
+        var map = {
+            'undefined': undefined,
+            'queryProperties': queryProperties
+        }
+
+        return map;
     }
 
     function parseQuery(criteria) {
@@ -68,13 +103,13 @@ function jwEngine() {
 
     return {
         'constructNestedObject': constructNestedObject,
+        'getNestedMapping': getNestedMapping,
         'parseQuery': parseQuery
     }
 }
 
 function jw(o) {
-
-    if (!o || typeof o !== 'object' || Array.isArray(o))
+    if (!o || typeof o !== 'object')
         throw new jwException('j-walk: invalid selector. expected: object')
 
     function get(o, query) {
@@ -86,19 +121,26 @@ function jw(o) {
             var property = tree.shift();
 
             if (Array.isArray(property)) {
-                for (var key in o) {
-                    if (o[key].hasOwnProperty(property[0])) {
+
+                var interest = tree.shift();
+                var key = property[0].split('=')[0]
+                var keyValue = property[0].split('=')[1]
+
+                for (var i = 0; i < o.length; i += 1) {
+
+                    if (o[i][key] == keyValue) {
                         if (tree.length > 0) {
-                            find(o[key][property[0]])
+                            return find(o[i][interest])
                         } else {
-                            found = o[key][property[0]]
+                            found = o[i][interest];
                             return;
                         }
                     }
                 }
+
             } else {
                 if (o.hasOwnProperty(property) && tree.length > 0) {
-                    find(o[property])
+                    return find(o[property])
                 } else {
                     found = o[property]
                     return;
@@ -121,8 +163,35 @@ function jw(o) {
             if (o.hasOwnProperty(property) && tree.length > 0) {
                 find(o[property])
             } else {
-                exists = o.hasOwnProperty(property)
-                return;
+
+                if (Array.isArray(o)) {
+
+                    var interest = tree.shift();
+                    var key = property[0].split('=')[0]
+                    var keyValue = property[0].split('=')[1]
+
+                    for (var i = 0; i < o.length; i += 1) {
+
+                        if (o[i][key] == keyValue) {
+
+                            if (interest) {
+                                if (tree.length > 0) {
+                                    return find(o[i][interest])
+                                } else {
+                                    exists = o[i].hasOwnProperty(interest)
+                                    return;
+                                }
+                            } else {
+                                exists = true;
+                                return;
+                            }
+                        }
+                    }
+
+                } else {
+                    exists = o.hasOwnProperty(property)
+                    return;
+                }
             }
         }
 
@@ -130,7 +199,7 @@ function jw(o) {
         return exists;
     }
 
-    function set(o, query, value, create) {
+    function set(o, query, value) {
 
         var tree = engine.parseQuery(query)
         var exists = [];
@@ -141,96 +210,34 @@ function jw(o) {
 
             if (obj.hasOwnProperty(property) && !Array.isArray(obj) && tree.length > 0) {
                 exists.push(property)
-                if (tree.length !== 0) {
+                if (tree.length !== 0)
                     walk(obj[property], value)
-                }
             } else {
                 if (Array.isArray(obj)) {
-
                     var identifier = property[0].split('=')[0]
                     var identifierKey = property[0].split('=')[1]
 
                     for (var i = 0; i < obj.length; i += 1) {
-
-
-
                         var found = false;
                         if (obj[i][identifier] == identifierKey) {
                             found = true;
                             var suppliedKeys = Object.keys(value)
                             if (tree.length !== 0) {
                                 exists.push(property)
-
                                 return walk(obj[i], value)
                             } else {
-
                                 for (var o = 0; o < suppliedKeys.length; o += 1) {
                                     obj[i][suppliedKeys[o]] = value[suppliedKeys[o]];
                                 }
                             }
                         }
                     }
-
-                    if (!found && create) {
-
-                        var identifier = property[0].split('=')[0]
-                        var identifierKey = property[0].split('=')[1]
-
-                        value[identifier] = identifierKey
-
-                        console.log(obj)
-
-                        obj.push(value)
-
-                        //if(tree.length > 0) {
-                        //    return walk(obj[0], value)
-                        //}
-                    }
                 } else {
+                    var nestedMapping = engine.getNestedMapping(engine.parseQuery(query), exists)
+                    var nested = engine.constructNestedObject(nestedMapping, value)
 
-                    var undefined = [];
-                    var reference = engine.parseQuery(query);
-
-
-
-
-                    var queryProperties = {}
-
-                    var baseArray = false;
-
-                    reference.slice(exists.length, reference.length).forEach(function (x) {
-
-                        var push = {'property': null, 'isArray': false, value: null}
-
-                        if (Array.isArray(x)) {
-
-                            var p = x[0].split('=')[0]
-                            var v = x[0].split('=')[1]
-
-                            queryProperties[p] = v
-                            push.property = p;
-
-                        } else {
-                            push.property = x
-                        }
-
-                        undefined.push(push)
-
-                        if (Array.isArray(x) && undefined.length > 1) {
-                            undefined[undefined.length - 2].isArray = true;
-                        } else if(Array.isArray(x) && undefined.length === 1) {
-                            baseArray = true;
-                            undefined[undefined.length - 1].isArray = true;
-                        }
-                    });
-
-                    var nested = engine.constructNestedObject(undefined, value, queryProperties)
-
-                    if (nested) {
+                    if (nested)
                         obj[property] = nested[property]
-                    }
-                    else {
-                    }
                 }
             }
         }
@@ -242,8 +249,8 @@ function jw(o) {
         return get(o, query);
     }
 
-    this.set = function (query, value, create) {
-        return set(o, query, value, create)
+    this.set = function (query, value) {
+        return set(o, query, value)
     }
 
     this.exists = function (query) {

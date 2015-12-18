@@ -27,10 +27,6 @@ describe('j-walk tests:init', function () {
         expect(function () {
             jw(null).get('whatever')
         }).to.throw(new exception('j-walk: invalid selector. expected: object'));
-
-        expect(function () {
-            jw(['a', 'b', 'c']).get('whatever')
-        }).to.throw(new exception('j-walk: invalid selector. expected: object'));
     })
 });
 
@@ -152,94 +148,128 @@ describe('j-walk tests:get', function () {
 
 describe('j-walk tests:get:array', function () {
 
-    // todo
-    it('should return the value: 42. single nested array selector', function () {
+    it('should return the value: 42. immediate array. immediate property. simple value', function () {
+
+        var base = [
+            {'id': 26, value: 21},
+            {'id': 42, value: 42},
+            {'id': 84, value: 84}
+        ];
+
+        jw(base).get('[id=42].value').should.equal(42);
+    });
+
+    it('should return the value: 42. immediate array. immediate property. object value', function () {
+
+        var base = [
+            {'id': 26, value: 21},
+            {'id': 42, value: {something: 'foo'}},
+            {'id': 84, value: 84}
+        ]
+
+        var expected = {something: 'foo'}
+
+        jw(base).get('[id=42].value').should.deep.equal(expected);
+    });
+
+    it('should return the value: 42. single nested array selector. immediate property. simple value', function () {
 
         var base = {
             'root': [
-                {'sub-a': 26},
-                {'sub-b': 42},
-                {'sub-c': 84}
+                {'id': 26, value: 21},
+                {'id': 42, value: 42},
+                {'id': 84, value: 84}
             ]
         };
 
-        jw(base).get('root.[sub-b]').should.equal(42);
+        jw(base).get('root.[id=42].value').should.equal(42);
     });
 
-    it('should return the value: 42. single nested array selector. nested single value', function () {
+    it('should return the value: 42. single nested array selector. immediate property. object value', function () {
 
         var base = {
             'root': [
-                {'sub-a': 26},
-                {'sub-b': {'target': 42}},
-                {'sub-c': 84}
+                {'id': 26, value: 21},
+                {'id': 42, value: {'something': 'foo'}},
+                {'id': 84, value: 84}
             ]
         };
 
-        jw(base).get('root.[sub-b].target').should.equal(42);
+        var expected = {'something': 'foo'}
+
+        jw(base).get('root.[id=42].value').should.deep.equal(expected);
     });
 
-    it('should return the value: 42. single nested array selector. nested object value', function () {
+    it('should return the value: 42. single nested array selector. deeply nested property. simple value', function () {
 
         var base = {
             'root': [
-                {'sub-a': 26},
-                {'sub-b': {'target': 42}},
-                {'sub-c': 84}
+                {'id': 1, value: 21},
+                {'id': 2, value: 42, nested: {deep: 42}},
+                {'id': 3, value: 84}
             ]
         };
 
-        var expected = {'target': 42}
-
-        jw(base).get('root.[sub-b]').should.deep.equal(expected);
+        jw(base).get('root.[id=2].nested.deep').should.equal(42);
     });
 
-    it('should return the value: 42. multiple nested sibling arrays', function () {
-
+    it('should return the value: 42. single nested array selector. deeply nested property. simple value', function () {
         var base = {
             'root': [
-                {'sub-a': [{'deep-a': 10}, {'deep-b': 20}, {'deep-c': 30}]},
-                {'sub-b': [{'deep-a': 40}, {'deep-b': 42}, {'deep-d': 60}]},
-                {'sub-c': [{'deep-a': 70}, {'deep-b': 80}, {'deep-e': 90}]}
-            ],
-            'irrelevant': [2, 3, 6]
-        };
-
-        jw(base).get('root.[sub-b].[deep-b]').should.equal(42);
-    });
-
-    // this could be changed later on to return all matches, or traverse further - but will return first found for now
-    it('should return the value: 42, in the first array named instance if array contains duplicate sibling property names', function () {
-
-        var base = {
-            'root': [
-                {'sub-a': {'same': 42}},
+                {'id': 1, value: 21},
+                {'id': 2, value: 42, nested: {deep: {deeper: 'foo'}}},
+                {'id': 3, value: 84}
             ]
         };
 
-        jw(base).get('root.[sub-a].same').should.equal(42);
-        jw(base).get('root.[sub-a].same').should.not.equal(84);
-        jw(base).get('root.[sub-a].same').should.not.equal('no way');
+        var expected = {deeper: 'foo'}
+
+        jw(base).get('root.[id=2].nested.deep').should.deep.equal(expected);
     });
 
-    it('should return the value: 42, traversing multiple nested arrays', function () {
+    it('should return the value: 42. deeply nested array selector. immediate property. simple value', function () {
 
         var base = {
             'root': {
-                'parent-a': [
-                    {'child-a': {}},
-                    {
-                        'child-b': [
-                            {'grandchild-a': 21},
-                            {'grandchild-b': 42},
-                            {'grandchild-c': 84}]
-                    }],
-                'parent-b': {}
+                'sub': {
+                    'deep': {
+                        'deeper': [
+                            {'id': 1, value: 21},
+                            {'id': 2, value: 42},
+                            {'id': 3, value: 84}
+                        ]
+                    }
+                }
             }
         };
 
-        jw(base).get('root.parent-a.[child-b].[grandchild-b]').should.equal(42);
+        jw(base).get('root.sub.deep.deeper.[id=2].value').should.equal(42);
+    });
 
+    it('should return the value: 42. traverse multiple specified arrays. immediate property. simple value', function () {
+
+        var base = {
+            'root': {
+                'collectionA': [
+                    {id: 1},
+                    {id: 2, collectionB: [{id: 10, value: 21}, {id: 20, value: 42}, {id: 30, value: 84}]},
+                    {id: 3}
+                ]
+            }
+        };
+
+        jw(base).get('root.collectionA.[id=2].collectionB.[id=20].value').should.equal(42);
+    });
+
+    it('should return undefined. array selector can not be found', function () {
+
+        var base = [
+            {'id': 1, value: 21},
+            {'id': 2, value: 42},
+            {'id': 3, value: 84}
+        ];
+
+        expect(jw(base).get('[id=4].value')).to.be.undefined;
     });
 });
 
@@ -291,35 +321,35 @@ describe('j-walk tests:set', function () {
         base.root.nested.sub.should.equal(42);
     });
 
-    //it('should set the immediate nested value: 42. object - pre-defined target property. defined sibling. ignore sibling value of 84', function () {
-    //    var base = {
-    //        root: {
-    //            sub: {},
-    //            ignored: 84
-    //        }
-    //    };
-    //
-    //    jw(base).set('root.sub', 42)
-    //
-    //    base.root.sub.should.equal(42);
-    //   // base.root.ignored.should.equal(84);
-    //});
+    it('should set the immediate nested value: 42. object - pre-defined target property. defined sibling. ignore sibling value of 84', function () {
+        var base = {
+            root: {
+                sub: {},
+                ignored: 84
+            }
+        };
 
-    //it('should set the deeply nested value: 42. object - pre-defined target property. defined sibling. ignore sibling value of 84', function () {
-    //    var base = {
-    //        root: {
-    //            sub: {
-    //                inner: {}
-    //            },
-    //            ignored: 84
-    //        }
-    //    };
-    //
-    //    jw(base).set('root.sub.inner', 42)
-    //
-    //    base.root.sub.inner.should.equal(42);
-    //    //base.root.ignored.should.equal(84);
-    //});
+        jw(base).set('root.sub', 42)
+
+        base.root.sub.should.equal(42);
+        // base.root.ignored.should.equal(84);
+    });
+
+    it('should set the deeply nested value: 42. object - pre-defined target property. defined sibling. ignore sibling value of 84', function () {
+        var base = {
+            root: {
+                sub: {
+                    inner: {}
+                },
+                ignored: 84
+            }
+        };
+
+        jw(base).set('root.sub.inner', 42)
+
+        base.root.sub.inner.should.equal(42);
+        //base.root.ignored.should.equal(84);
+    });
 
     it('should set the immediate nested value: 42. object - pre-defined target property. defined sibling. ignore sibling value of 84', function () {
         var base = {
@@ -591,37 +621,6 @@ describe('j-walk tests:set:array', function () {
         base.root[1].sub[1].value.should.equal('b');
         base.root[1].sub[1].other.should.equal('bar');
     });
-
-    it('should set array value - create and push new value if upsert flag specified to true', function () {
-        var base = {
-            root: []
-        };
-
-        jw(base).set('root.[id=2]', {'value': 42}, true);
-
-        base.root[0].id.should.equal('2');
-        base.root[0].value.should.equal(42);
-    });
-
-    it('should set array value - create and new value if upsert flag specified to true and now found within collection. push to existing collection', function () {
-        var base = {
-            root: [{id: 1, value: 10},{id: 3, value: 30}]
-        };
-
-        jw(base).set('root.[id=2]', {'value': 42}, true);
-
-        base.root[2].id.should.equal('2');
-        base.root[2].value.should.equal(42);
-    });
-
-    it('should set array value - ignore new object creation with upsert flag specified to false or not specified', function () {
-        var base = {
-            root: []
-        };
-
-        jw(base).set('root.[id=2]', {'value': 42});
-        base.root.length.should.equal(0);
-    });
 });
 
 describe('j-walk tests:exists', function () {
@@ -679,6 +678,86 @@ describe('j-walk tests:exists', function () {
     });
 });
 
+describe('j-walk tests:exists:array', function () {
+
+
+    it('should return: true - base array with existing target object. whole object exists', function () {
+        var base = {
+            'root': [{id: 1, value: 21}, {id: 2, value: 42}]
+        };
+
+        jw(base).exists('root.[id=2]').should.be.true;
+    });
+
+    it('should return: true - base array with existing target object. whole object sub property exists', function () {
+        var base = {
+            'root': [{id: 1, value: 21}, {id: 2, value: 42, target: 'foo'}]
+        };
+
+        jw(base).exists('root.[id=2].target').should.be.true;
+    });
+
+    it('should return: false - base array with non-existing target object. whole object exists', function () {
+        var base = {
+            'root': [{id: 1, value: 21}, {id: 2, value: 42}]
+        };
+
+        jw(base).exists('root.[id=3]').should.be.false;
+    });
+
+    it('should return: true - base array with existing target object. whole object sub undefined property does not exist', function () {
+        var base = {
+            'root': [{id: 1, value: 21}, {id: 2, value: 42, target: 'foo'}]
+        };
+
+        jw(base).exists('root.[id=2].nothere').should.be.false;
+    });
+
+    it('should return: true -single nested array with existing target object. whole object exists', function () {
+        var base = {
+            'root': {
+                collection: [{id: 1, value: 21}, {id: 2, value: 42}]
+            }
+        };
+
+        jw(base).exists('root.collection.[id=2]').should.be.true;
+    });
+
+    it('should return: true traverse multiple arrays. whole object exists', function () {
+        var base = {
+            'root': [
+                {id: 1, value: 10},
+                {
+                    id: 2, value: 20, sub: [
+                    {id: 'sub1', value: 'a'},
+                    {id: 'sub2', value: 'b'},
+                    {id: 'sub3', value: 'c'}
+                ]
+                },
+                {id: 3, value: 30}]
+        };
+
+        jw(base).exists('root.[id=2].sub.[id=sub3]').should.be.true;
+    });
+
+    it('should return: true traverse multiple arrays. whole object sub property exists', function () {
+        var base = {
+            'root': [
+                {id: 1, value: 10},
+                {
+                    id: 2, value: 20, sub: [
+                    {id: 'sub1', value: 'a'},
+                    {id: 'sub2', value: 'b'},
+                    {id: 'sub3', value: 'c'}
+                ]
+                },
+                {id: 3, value: 30}]
+        };
+
+        jw(base).exists('root.[id=2].sub.[id=sub3].value').should.be.true;
+    });
+});
+
 describe('j-walk tests:engine', function () {
 
     it('should parse the dot notation selector query:single value', function () {
@@ -710,46 +789,6 @@ describe('j-walk tests:engine', function () {
         actual.should.deep.equal(expected);
     });
 
-    //it('should create a nested object - initialize target value with empty object', function () {
-    //
-    //    var criteria = [{'property': 'root', 'isArray': false}, {
-    //        'property': 'sub',
-    //        'isArray': false
-    //    }, {'property': 'nested', 'isArray': false}]
-    //
-    //    var expected = {
-    //        'root': {
-    //            'sub': {
-    //                'nested': {}
-    //            }
-    //        }
-    //    };
-    //
-    //    var actual = engine.constructNestedObject(criteria)
-    //
-    //    actual.should.deep.equal(expected);
-    //});
-    //
-    //it('should create a nested object - initialize object with target property and value: [nested]:42', function () {
-    //
-    //    var criteria = [{'property': 'root', 'isArray': false}, {
-    //        'property': 'sub',
-    //        'isArray': false
-    //    }, {'property': 'nested', 'isArray': false}]
-    //
-    //    var expected = {
-    //        'root': {
-    //            'sub': {
-    //                'nested': 42
-    //            }
-    //        }
-    //    };
-    //
-    //    var actual = engine.constructNestedObject(criteria, 42)
-    //
-    //    actual.should.deep.equal(expected);
-    //});
-
     it('should throw exception: jwException - unable to parse selector query for invalid criteria', function () {
         expect(function () {
             engine.parseQuery(42)
@@ -774,5 +813,5 @@ describe('j-walk tests:engine', function () {
         expect(function () {
             engine.parseQuery(['a', 'b', 'c'])
         }).to.throw(new exception('j-walk: invalid selector query format. expected: string'));
-    })
+    });
 });
