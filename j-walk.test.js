@@ -151,12 +151,13 @@ describe('j-walk tests:get:array', function () {
     it('should return the value: 42. immediate array. immediate property. simple value', function () {
 
         var base = [
-            {'id': 26, value: 21},
-            {'id': 42, value: 42},
-            {'id': 84, value: 84}
+            {'id': 2, value: 21},
+            {'id': 4, value: 42},
+            {'id': 6, value: 84, name: 'scniro'}
         ];
 
-        jw(base).get('[id=42].value').should.equal(42);
+        jw(base).get('[id=4].value').should.equal(42);
+        jw(base).get('[name=scniro].value').should.equal(84);
     });
 
     it('should return the value: 42. immediate array. immediate property. object value', function () {
