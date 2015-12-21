@@ -76,6 +76,21 @@ var jw = require('j-walk').jw;
     };
     
     jw(base).get('root.collectionA.[id=2].collectionB.[id=20].value') // -- 42
- 
-        
+    
+    // set: create new property throughout selector tree
+    var base = {};
+    jw(base).set('root.nested.sub', 42);        // -- set simple value
+    jw(base).set('root.nested', { sub: 42 });   // -- set object value
+    // base = { root: { sub: { nested: 42 } } }
+    
+    // set: array
+    var base = { 'root': [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 30}]};
+    
+    jw(base).set('root.[id=2]', {other: 'foo'});
+    // 'root': [{id: 1, value: 10}, {id: 2, value: 20, other: 'foo'}, [...]
+    
+    // exists
+    var base = {'root': null};
+    jw(base).exists('root')         // -- true
+    jw(base).exists('root.nested')  // -- false
     
