@@ -2,15 +2,17 @@
 
 [![Build Status](https://api.travis-ci.org/scniro/j-walk.svg)](https://travis-ci.org/scniro/j-walk)
 
-A simple dot notation JavaScript object getter/setter
+a simple dot notation JavaScript object getter/setter
 
-##### Getting Started
+### getting started
 
 ```
 npm install j-walk
 ```
 
 * Include the `j-walk` module
+
+### api
 
 ```javascript
 var jw = require('j-walk').jw;
