@@ -2,7 +2,7 @@
 
 [![Build Status](https://api.travis-ci.org/scniro/j-walk.svg)](https://travis-ci.org/scniro/j-walk)
 
-A simple JavaScript object getter/setter
+A simple dot notation JavaScript object getter/setter
 
 ##### Getting Started
 
