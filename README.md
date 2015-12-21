@@ -23,8 +23,8 @@ var jw = require('j-walk').jw;
  
 ##### `jw(obj).set('selector', value)`
 
- - will create and set property value if undefined through the nesting chain
- - will stop new value creation at firt undefined array selector
+ - will create and set property value if `undefined` through the nesting chain
+ - will stop new value creation at first `undefined` array selector
 
 ##### `jw(obj).exists('selector')`
 
