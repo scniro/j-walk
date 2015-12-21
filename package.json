@@ -15,6 +15,15 @@
   "bugs": {
     "url": "https://github.com/scniro/j-walk/issues"
   },
+  "keywords": [
+    "json",
+    "javascript",
+    "dot-notation",
+    "dotnotation",
+    "object-mapper",
+    "objectmapper",
+    "json-mapper"
+  ],
   "homepage": "https://github.com/scniro/j-walk#readme",
   "devDependencies": {
     "chai": "^3.4.1",
