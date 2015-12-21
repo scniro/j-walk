@@ -16,14 +16,26 @@ var jw = require('j-walk').jw;
 ##### `jw(obj).get('selector')`
  - returns `undefined` if not found
  
+ ##### `jw(obj).set('selector', value)`
 
-    // -- simple
+ - will create and set property value if undefined through the nesting chain
+ - will stop new value creation at firt undefined array selector
+
+##### `jw(obj).exists('selector')`
+
+ - return the truthy value if the property in question is defined - value is ignored
+ 
+
+---
+ 
+    // -- selector demo
+    // -- get:simple
     var base = {'root': 42};
     
     jw(base).get('root');            // -- 42
     jw(base).get('root.nested-a');   // -- undefined
     
-    // -- nested
+    // -- get:nested
     var base = {
         'root': {
             'nested-a': {
@@ -38,7 +50,7 @@ var jw = require('j-walk').jw;
     jw(base).get('root.nested-a.nested-b.nested-c'); // -- 42
     jw(base).get('root.nested-a.sibling-a');         // -- 84
     
-    // array - simple
+    // get:array - simple
     var base = [
         {'id': 2, value: 21},
         {'id': 4, value: 42},
@@ -49,7 +61,7 @@ var jw = require('j-walk').jw;
     jw(base).get('[id=5].value')        // -- undefined
     jw(base).get('[name=scniro].value') // -- 84
     
-    // array - nested
+    // get:array - nested
     var base = {
         'root': {
             'collectionA': [
@@ -64,15 +76,6 @@ var jw = require('j-walk').jw;
     };
     
     jw(base).get('root.collectionA.[id=2].collectionB.[id=20].value') // -- 42
-    
-##### `jw(obj).set('selector', value)`
-
- - will create and set property value if undefined through the nesting chain
- - will stop new value creation at firt undefined array selector
-
-##### `jw(obj).exists('selector')`
-
- - return the truthy value if the property in question is defined - value is ignored
  
         
     
