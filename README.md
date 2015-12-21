@@ -4,13 +4,9 @@
 
 a simple dot notation JavaScript object getter/setter
 
-### getting started
-
 ```
 npm install j-walk
 ```
-
-* Include the `j-walk` module
 
 ### api
 
