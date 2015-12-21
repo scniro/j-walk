@@ -27,5 +27,8 @@
   },
   "scripts": {
     "test": "gulp test"
+  },
+  "engines": {
+    "node": ">=4.0"
   }
 }
