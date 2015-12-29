@@ -1,3 +1,5 @@
 **/.*
+.*
 gulpfile.js
 j-walk.test.js
+bower.json
