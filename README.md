@@ -5,7 +5,7 @@
 a simple dot notation JavaScript object getter/setter
 
 ```
-npm install j-walk
+<npm|bower> install j-walk
 ```
 
 ### api

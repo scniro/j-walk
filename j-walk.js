@@ -228,6 +228,12 @@ function jw(o) {
 
 var engine = new jwHelper();
 
-module.exports.jw = jw;
-module.exports.jwHelper = jwHelper;
-module.exports.jwException = jwException;
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports.jw = jw;
+    module.exports.jwHelper = jwHelper;
+    module.exports.jwException = jwException;
+}
+
+if (typeof window !== 'undefined') {
+    window.jw = jw;
+}
