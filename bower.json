@@ -12,7 +12,6 @@
     "**/.*",
     "node_modules",
     "j-walk.test.js",
-    "gulpfile.js",
-    "travis.yml"
+    "gulpfile.js"
   ]
 }
