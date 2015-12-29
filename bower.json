@@ -1,7 +1,7 @@
 {
   "name": "j-walk",
   "main": "j-walk.js",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "A simple dot notation JavaScript object getter/setter",
   "homepage": "https://github.com/scniro/j-walk#readme",
   "authors": [
