@@ -11,7 +11,7 @@ a simple dot notation JavaScript object getter/setter
 ### api
 
 ```javascript
-var jw = require('j-walk').jw;
+var jw = require('j-walk').jw; // -- nodejs. window.jw -- browser
 ```
 
 ##### `jw(obj).get('selector')`

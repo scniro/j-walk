@@ -2,4 +2,6 @@
 .*
 gulpfile.js
 j-walk.test.js
+j-walk.sandbox.js
+j-walk.min.js
 bower.json
