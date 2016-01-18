@@ -1,6 +1,7 @@
 # j-walk
 
 [![Build Status](https://api.travis-ci.org/scniro/j-walk.svg)](https://travis-ci.org/scniro/j-walk)
+[![NPM Version](https://img.shields.io/npm/v/j-walk.svg?style=flat)](https://www.npmjs.org/package/j-walk)
 
 a simple dot notation JavaScript object getter/setter
 
