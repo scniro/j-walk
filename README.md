@@ -13,15 +13,15 @@
 
 ## API
 
-#### `jw(*selector*).get(*key*)`
+#### jw(*selector*).get(*key*)
 > returns `undefined` if not found
  
-#### `jw(*selector*).set(*key*, *value*)`
+#### jw(*selector*).set(*key*, *value*)
 
 > create and set property value if `undefined` through the nesting chain
 > stops new value creation at first `undefined` array selector
 
-#### `jw(*selector*).exists(*key*)`
+#### jw(*selector*).exists(*key*)
 
 > truthy assertion if property is defined
  
