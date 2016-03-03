@@ -5,7 +5,7 @@ var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
 
 gulp.task('test', function(){
-    return gulp.src('j-walk.test.js')
+    return gulp.src('test.js')
         .pipe(mocha({ reporter: 'list' }))
         .on('error', gutil.log);
 });
