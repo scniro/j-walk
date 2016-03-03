@@ -18,8 +18,7 @@
  
 #### jw(*selector*).set(*key*, *value*)
 
-> create and set property value if `undefined` through the nesting chain
-> stops new value creation at first `undefined` array selector
+> create and set property value if `undefined` through the nesting chain. Stops new value creation at first `undefined` array selector
 
 #### jw(*selector*).exists(*key*)
 
