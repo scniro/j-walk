@@ -1,8 +1,8 @@
 var chai = require('chai');
 var expect = chai.expect;
-var jw = require('./j-walk.js');
-var jwHelper = new require('./j-walk.js').jwHelper();
-var exception = require('./j-walk.js').jwException;
+var jw = require('..');
+var jwHelper = new jw.jwHelper();
+var exception = jw.jwException;
 
 chai.should();
 
