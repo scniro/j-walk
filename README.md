@@ -5,7 +5,6 @@
 [![Dependency Status](https://img.shields.io/badge/deps-none-ff69b4.svg?style=flat-square)](http://img.photobucket.com/albums/v172/mandala/Publica/excite.gif)
 [![devDependency Status](https://img.shields.io/david/dev/scniro/j-walk.svg?label=devDeps&style=flat-square)](https://david-dm.org/scniro/j-walk#info=devDependencies)
 [![Coverage](https://img.shields.io/coveralls/scniro/j-walk.svg?style=flat-square)](https://coveralls.io/github/scniro/j-walk)
-[![Climate](https://img.shields.io/codeclimate/github/scniro/j-walk.svg?label=climate&style=flat-square)](https://codeclimate.com/github/scniro/j-walk)
 
 > simple dot notation JavaScript object getter/setter
 
