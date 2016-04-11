@@ -1,8 +1,29 @@
-languages:
-  Ruby: true
-  JavaScript: true
-  PHP: true
-  Python: true
+engines:
+  rubocop:
+    enabled: true
+    #checks:
+    # Rubocop/Metrics/ClassLength:
+    #   enabled: false
+  golint:
+    enabled: true
+  eslint:
+    enabled: true
+  csslint:
+    enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - ruby
+        #mass_threshold: 30
+      - javascript
+ratings:
+  paths:
+  - app/**
+  - lib/**
+  - "**.rb"
+  - "**.go"
 exclude_paths:
+- "**/vendor/**/*"
 - "lib/j-walk.js"
 - "lib/j-walk.min.js"
