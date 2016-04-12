@@ -1,3 +1,5 @@
+global.window = {};
+
 var chai = require('chai');
 var expect = chai.expect;
 var jw = require('..');
@@ -16,7 +18,7 @@ describe('j-walk tests:init', function () {
         expect(api).to.have.property('get');
         expect(api).to.have.property('set');
         expect(api).to.have.property('exists');
-    })
+    });
 
     it('should throw exception: jwException - unable to parse selector query for invalid criteria', function () {
         expect(function () {
@@ -38,7 +40,11 @@ describe('j-walk tests:init', function () {
         expect(function () {
             jw(null).get('whatever')
         }).to.throw(new exception('j-walk: invalid selector. expected: object'));
-    })
+    });
+
+    it('should set window', function () {
+        expect(window.jw).to.exist;
+    });
 });
 
 describe('j-walk tests:get', function () {
