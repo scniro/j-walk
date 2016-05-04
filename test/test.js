@@ -161,6 +161,12 @@ describe('j-walk tests:get', function () {
         };
         expect(jw(base).get('root.nested-a.nested-b.nested-c.nested-d')).to.be.undefined;
     });
+
+    it('should return the basic value: tack in property name', function () {
+
+        var base = {'root-tack': 42};
+        jw(base).get('root-tack').should.equal(42);
+    });
 });
 
 describe('j-walk tests:get:array', function () {
@@ -600,6 +606,20 @@ describe('j-walk tests:set:array', function () {
         jw(base).set('root.[id=2].sub.[id=sub2]', {other: 'bar'});
         base.root[1].sub[1].value.should.equal('b');
         base.root[1].sub[1].other.should.equal('bar');
+    });
+
+    it('should set the root value: 42. empty object - undefined property', function () {
+        var base = {};
+        jw(base).set('root', 42)
+        base.root.should.equal(42);
+    });
+
+
+    it('should return the value: 42. immediate array. immediate property. simple value', function () {
+        var base = {};
+        jw(base).set('root.something-cool', 42)
+
+        var found = jw(base).get('root.something-cool')
     });
 });
 
