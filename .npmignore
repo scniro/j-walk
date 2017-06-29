@@ -1,6 +1,15 @@
+<<<<<<< HEAD
 test.js
 .travis.yml
 .gitignore
 .npmignore
 .coverage
 .idea
+=======
+**/.*
+.*
+gulpfile.js
+test
+lib/j-walk.min.js
+bower.json
+>>>>>>> origin/master

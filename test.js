@@ -35,6 +35,7 @@ describe('j-walk tests:init', () => {
       jw(undefined).get('whatever')
     }).to.throw('j-walk: invalid selector. expected: object');
 
+
     expect(() => {
       jw(null).get('whatever')
     }).to.throw('j-walk: invalid selector. expected: object');
@@ -785,3 +786,4 @@ describe('j-walk tests:jwHelper', () => {
     }).to.throw('j-walk: invalid selector query format. expected: string');
   });
 });
+
