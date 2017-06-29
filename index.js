@@ -10,7 +10,7 @@ function worker() {
 
     function nest(constructed, propArray, value, queryProperties) {
 
-      let p = propArray.shift();
+      var p = propArray.shift();
 
       if (p && propArray.length > 0) {
         constructed[p['property']] = p.isArray ? [] : {};
@@ -27,12 +27,12 @@ function worker() {
 
   function getNestedMapping(query, identified) {
 
-    let undefined = [];
-    let queryProperties = {};
+    var undefined = [];
+    var queryProperties = {};
 
     query.slice(identified.length, query.length).forEach(function (x) {
 
-      let push = {'property': x, 'isArray': false, value: null};
+      var push = {'property': x, 'isArray': false, value: null};
 
       undefined.push(push);
     });
@@ -48,12 +48,12 @@ function worker() {
     if (!criteria || typeof criteria !== 'string')
       throw new exception('j-walk: invalid selector query format. expected: string');
 
-    let tree = criteria.split('.');
-    let bracketsRegex = /\[(.*?)\]/;
+    var tree = criteria.split('.');
+    var bracketsRegex = /\[(.*?)\]/;
 
-    for (let i = 0; i < tree.length; i += 1) {
+    for (var i = 0; i < tree.length; i += 1) {
       if (tree[i].match(bracketsRegex)) {
-        let transformed = tree[i].split(bracketsRegex).filter(function (x) {
+        var transformed = tree[i].split(bracketsRegex).filter(function (x) {
           return x !== ''
         });
         tree[i] = transformed
@@ -74,24 +74,24 @@ function jwalk(o) {
   if (!o || typeof o !== 'object')
     throw new exception('j-walk: invalid selector. expected: object');
 
-  let self = this;
+  var self = this;
 
   function exists(o, query) {
 
-    let tree = engine.parseQuery(query);
-    let exists = false;
+    var tree = engine.parseQuery(query);
+    var exists = false;
 
     function find(o) {
-      let property = tree.shift();
+      var property = tree.shift();
 
       if (o.hasOwnProperty(property) && tree.length > 0) {
         find(o[property])
       } else {
         if (Array.isArray(o)) {
-          let interest = tree.shift();
-          let key = property[0].split('=')[0];
-          let keyValue = property[0].split('=')[1];
-          for (let i = 0; i < o.length; i += 1) {
+          var interest = tree.shift();
+          var key = property[0].split('=')[0];
+          var keyValue = property[0].split('=')[1];
+          for (var i = 0; i < o.length; i += 1) {
             if (o[i][key] == keyValue) {
               if (interest)
                 return tree.length > 0 ? find(o[i][interest]) : exists = o[i].hasOwnProperty(interest);
@@ -110,17 +110,17 @@ function jwalk(o) {
 
   function get(o, query) {
 
-    let tree = engine.parseQuery(query);
-    let found;
+    var tree = engine.parseQuery(query);
+    var found;
 
     function find(o) {
-      let property = tree.shift();
+      var property = tree.shift();
 
       if (Array.isArray(property)) {
-        let interest = tree.shift();
-        let key = property[0].split('=')[0];
-        let keyValue = property[0].split('=')[1];
-        for (let i = 0; i < o.length; i += 1) {
+        var interest = tree.shift();
+        var key = property[0].split('=')[0];
+        var keyValue = property[0].split('=')[1];
+        for (var i = 0; i < o.length; i += 1) {
           if (o[i][key] == keyValue)
             return tree.length > 0 ? find(o[i][interest]) : found = o[i][interest]
         }
@@ -134,12 +134,12 @@ function jwalk(o) {
 
   function set(o, query, value) {
 
-    let tree = engine.parseQuery(query);
-    let exists = [];
+    var tree = engine.parseQuery(query);
+    var exists = [];
 
     function walk(obj, value) {
 
-      let property = tree.shift();
+      var property = tree.shift();
 
       if (obj.hasOwnProperty(property) && !Array.isArray(obj) && tree.length > 0) {
         exists.push(property);
@@ -147,27 +147,27 @@ function jwalk(o) {
           walk(obj[property], value)
       } else {
         if (Array.isArray(obj)) {
-          let identifier = property[0].split('=')[0];
-          let identifierKey = property[0].split('=')[1];
+          var identifier = property[0].split('=')[0];
+          var identifierKey = property[0].split('=')[1];
 
-          for (let i = 0; i < obj.length; i += 1) {
-            let found = false;
+          for (var i = 0; i < obj.length; i += 1) {
+            var found = false;
             if (obj[i][identifier] == identifierKey) {
               found = true;
-              let suppliedKeys = Object.keys(value);
+              var suppliedKeys = Object.keys(value);
               if (tree.length !== 0) {
                 exists.push(property);
                 return walk(obj[i], value)
               } else {
-                for (let o = 0; o < suppliedKeys.length; o += 1) {
+                for (var o = 0; o < suppliedKeys.length; o += 1) {
                   obj[i][suppliedKeys[o]] = value[suppliedKeys[o]];
                 }
               }
             }
           }
         } else {
-          let nestedMapping = engine.getNestedMapping(engine.parseQuery(query), exists);
-          let nested = engine.constructNestedObject(nestedMapping, value);
+          var nestedMapping = engine.getNestedMapping(engine.parseQuery(query), exists);
+          var nested = engine.constructNestedObject(nestedMapping, value);
           if (nested)
             obj[property] = nested[property]
         }
@@ -192,7 +192,7 @@ function jwalk(o) {
   return self;
 }
 
-let engine = new worker();
+var engine = new worker();
 
 module.exports = jwalk;
 module.exports.worker = worker;

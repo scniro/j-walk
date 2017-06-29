@@ -1,8 +1,8 @@
-let chai = require('chai');
-let expect = chai.expect;
-let jw = require('./index.js');
-let worker = new require('./index.js').worker();
-let exception = require('./index.js').exception;
+var chai = require('chai');
+var expect = chai.expect;
+var jw = require('./index.js');
+var worker = new require('./index.js').worker();
+var exception = require('./index.js').exception;
 
 chai.should();
 
@@ -11,7 +11,7 @@ describe('j-walk tests:init', () => {
   it('should exist with API', () => {
     expect(jw).to.exist;
 
-    let api = jw({});
+    var api = jw({});
 
     expect(api).to.have.property('get');
     expect(api).to.have.property('set');
@@ -45,12 +45,12 @@ describe('j-walk tests:init', () => {
 describe('j-walk tests:get', () => {
 
   it('should return the value: 42', () => {
-    let base = {'root': 42};
+    var base = {'root': 42};
     jw(base).get('root').should.equal(42);
   });
 
   it('should return the value: [object]', () => {
-    let base = {
+    var base = {
       'root': {
         'value': {
           'subvalue': 42
@@ -58,7 +58,7 @@ describe('j-walk tests:get', () => {
       }
     };
 
-    let expected = {
+    var expected = {
       'value': {
         'subvalue': 42
       }
@@ -68,7 +68,7 @@ describe('j-walk tests:get', () => {
   });
 
   it('should return the value: 42. single nested. no siblings', () => {
-    let base = {
+    var base = {
       'root': {
         'nested-a': 42
       }
@@ -77,7 +77,7 @@ describe('j-walk tests:get', () => {
   });
 
   it('should return the value: [object]. single nested. no siblings', () => {
-    let base = {
+    var base = {
       'root': {
         'value': {
           'subvalue-1': {
@@ -87,7 +87,7 @@ describe('j-walk tests:get', () => {
       }
     };
 
-    let expected = {
+    var expected = {
       'subvalue-1': {
         'subvalue-2': 42
       }
@@ -96,7 +96,7 @@ describe('j-walk tests:get', () => {
   });
 
   it('should return the value: 42. deeply nested. no siblings', () => {
-    let base = {
+    var base = {
       'root': {
         'nested-a': {
           'nested-b': {
@@ -109,7 +109,7 @@ describe('j-walk tests:get', () => {
   });
 
   it('should return the value: 42. single nested. root sibling value ignored - remains 84', () => {
-    let base = {
+    var base = {
       'root': {
         'nested-a': 42,
         'sibling-a': 84
@@ -120,7 +120,7 @@ describe('j-walk tests:get', () => {
   });
 
   it('should return the value: 42. deeply nested. root sibling value ignored - remains 84', () => {
-    let base = {
+    var base = {
       'root': {
         'nested-a': {
           'nested-b': {
@@ -135,12 +135,12 @@ describe('j-walk tests:get', () => {
   });
 
   it('should return the value: undefined. selector specified for empty object', () => {
-    let base = {};
+    var base = {};
     expect(jw(base).get('root.nested-a')).to.be.undefined;
   });
 
   it('should return the value: undefined. single additional selector not defined on object', () => {
-    let base = {
+    var base = {
       'root': {
         'nested-a': {},
       }
@@ -149,7 +149,7 @@ describe('j-walk tests:get', () => {
   });
 
   it('should return the value: undefined. deeply nested selector not defined on object', () => {
-    let base = {
+    var base = {
       'root': {
         'nested-a': {},
       }
@@ -162,7 +162,7 @@ describe('j-walk tests:get:array', () => {
 
   it('should return the value: 42. immediate array. immediate property. simple value', () => {
 
-    let base = [
+    var base = [
       {'id': 2, value: 21},
       {'id': 4, value: 42},
       {'id': 6, value: 84, name: 'scniro'}
@@ -174,20 +174,20 @@ describe('j-walk tests:get:array', () => {
 
   it('should return the value: 42. immediate array. immediate property. object value', () => {
 
-    let base = [
+    var base = [
       {'id': 26, value: 21},
       {'id': 42, value: {something: 'foo'}},
       {'id': 84, value: 84}
     ]
 
-    let expected = {something: 'foo'};
+    var expected = {something: 'foo'};
 
     jw(base).get('[id=42].value').should.deep.equal(expected);
   });
 
   it('should return the value: 42. single nested array selector. immediate property. simple value', () => {
 
-    let base = {
+    var base = {
       'root': [
         {'id': 26, value: 21},
         {'id': 42, value: 42},
@@ -200,7 +200,7 @@ describe('j-walk tests:get:array', () => {
 
   it('should return the value: 42. single nested array selector. immediate property. object value', () => {
 
-    let base = {
+    var base = {
       'root': [
         {'id': 26, value: 21},
         {'id': 42, value: {'something': 'foo'}},
@@ -208,14 +208,14 @@ describe('j-walk tests:get:array', () => {
       ]
     };
 
-    let expected = {'something': 'foo'};
+    var expected = {'something': 'foo'};
 
     jw(base).get('root.[id=42].value').should.deep.equal(expected);
   });
 
   it('should return the value: 42. single nested array selector. deeply nested property. simple value', () => {
 
-    let base = {
+    var base = {
       'root': [
         {'id': 1, value: 21},
         {'id': 2, value: 42, nested: {deep: 42}},
@@ -227,7 +227,7 @@ describe('j-walk tests:get:array', () => {
   });
 
   it('should return the value: 42. single nested array selector. deeply nested property. simple value', () => {
-    let base = {
+    var base = {
       'root': [
         {'id': 1, value: 21},
         {'id': 2, value: 42, nested: {deep: {deeper: 'foo'}}},
@@ -235,14 +235,14 @@ describe('j-walk tests:get:array', () => {
       ]
     };
 
-    let expected = {deeper: 'foo'};
+    var expected = {deeper: 'foo'};
 
     jw(base).get('root.[id=2].nested.deep').should.deep.equal(expected);
   });
 
   it('should return the value: 42. deeply nested array selector. immediate property. simple value', () => {
 
-    let base = {
+    var base = {
       'root': {
         'sub': {
           'deep': {
@@ -261,7 +261,7 @@ describe('j-walk tests:get:array', () => {
 
   it('should return the value: 42. traverse multiple specified arrays. immediate property. simple value', () => {
 
-    let base = {
+    var base = {
       'root': {
         'collectionA': [
           {id: 1},
@@ -276,7 +276,7 @@ describe('j-walk tests:get:array', () => {
 
   it('should return undefined. array selector can not be found', () => {
 
-    let base = [
+    var base = [
       {'id': 1, value: 21},
       {'id': 2, value: 42},
       {'id': 3, value: 84}
@@ -289,28 +289,28 @@ describe('j-walk tests:get:array', () => {
 describe('j-walk tests:set', () => {
 
   it('should set the root value: 42. empty object - undefined property', () => {
-    let base = {};
+    var base = {};
 
     jw(base).set('root', 42);
     base.root.should.equal(42);
   });
 
   it('should set the immediate nested value: 42. empty object - undefined property', () => {
-    let base = {};
+    var base = {};
 
     jw(base).set('root.nested', 42);
     base.root.nested.should.equal(42);
   });
 
   it('should set the deeply nested value: 42. empty object - undefined property', () => {
-    let base = {};
+    var base = {};
 
     jw(base).set('root.nested.sub', 42);
     base.root.nested.sub.should.equal(42);
   });
 
   it('should set the immediate nested value: 42. object - pre-defined property', () => {
-    let base = {
+    var base = {
       nested: {}
     };
 
@@ -319,7 +319,7 @@ describe('j-walk tests:set', () => {
   });
 
   it('should set the deeply nested value: 42. object - pre-defined property', () => {
-    let base = {
+    var base = {
       nested: {
         sub: {}
       }
@@ -330,7 +330,7 @@ describe('j-walk tests:set', () => {
   });
 
   it('should set the immediate nested value: 42. object - pre-defined target property. defined sibling. ignore sibling value of 84', () => {
-    let base = {
+    var base = {
       root: {
         sub: {},
         ignored: 84
@@ -343,7 +343,7 @@ describe('j-walk tests:set', () => {
   });
 
   it('should set the deeply nested value: 42. object - pre-defined target property. defined sibling. ignore sibling value of 84', () => {
-    let base = {
+    var base = {
       root: {
         sub: {
           inner: {}
@@ -358,7 +358,7 @@ describe('j-walk tests:set', () => {
   });
 
   it('should set the immediate nested value: 42. object - pre-defined target property. defined sibling. ignore sibling value of 84', () => {
-    let base = {
+    var base = {
       root: {
         ignored: 84
       }
@@ -370,7 +370,7 @@ describe('j-walk tests:set', () => {
   });
 
   it('should set the deeply nested value: 42. object - pre-defined target property. defined sibling. ignore sibling value of 84', () => {
-    let base = {
+    var base = {
       root: {
         ignored: 84
       }
@@ -382,13 +382,13 @@ describe('j-walk tests:set', () => {
   });
 
   it('should set the immediate nested value: [object]. object - undefined target property. defined sibling. ignore sibling value of 84', () => {
-    let base = {
+    var base = {
       root: {
         ignored: 84
       }
     };
 
-    let value = {val: 42};
+    var value = {val: 42};
 
     jw(base).set('root.sub', value);
     base.root.sub.should.deep.equal(value);
@@ -396,12 +396,12 @@ describe('j-walk tests:set', () => {
   });
 
   it('should set the deeply nested value: [object]. object - undefined target property. defined sibling. ignore sibling value of 84', () => {
-    let base = {
+    var base = {
       root: {
         ignored: 84
       }
     };
-    let value = {
+    var value = {
       nested: {val: 42}
     }
 
@@ -411,12 +411,12 @@ describe('j-walk tests:set', () => {
   });
 
   it('should set the immediate nested value: [object]. object - pre-defined target property. defined sibling. ignore sibling value of 84', () => {
-    let base = {
+    var base = {
       root: {ignored: 84},
       sub: {val: {}}
     };
 
-    let value = {val: 42};
+    var value = {val: 42};
 
     jw(base).set('root.sub', value);
     base.root.sub.should.deep.equal(value);
@@ -428,7 +428,7 @@ describe('j-walk tests:set:array', () => {
 
   it('should set array value - specified by id. single defined property.', () => {
 
-    let base = {
+    var base = {
       'root': [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 30}]
     };
     jw(base).set('root.[id=2]', {value: 42});
@@ -437,7 +437,7 @@ describe('j-walk tests:set:array', () => {
 
   it('should set array value - specified by id. single defined property. ignore sibling value.', () => {
 
-    let base = {
+    var base = {
       'root': [{id: 1, value: 10, secondary: 'a'}, {id: 2, value: 20, secondary: 'b'}, {
         id: 3,
         value: 30,
@@ -452,7 +452,7 @@ describe('j-walk tests:set:array', () => {
 
   it('should set array value - specified by id. multiple defined properties', () => {
 
-    let base = {
+    var base = {
       'root': [{id: 1, value: 10, secondary: 'a'}, {id: 2, value: 20, secondary: 'b'}, {
         id: 3,
         value: 30,
@@ -467,7 +467,7 @@ describe('j-walk tests:set:array', () => {
 
   it('should set array value - specified by id. multiple undefined properties', () => {
 
-    let base = {
+    var base = {
       'root': [{id: 1}, {id: 2}, {id: 3}]
     };
 
@@ -478,7 +478,7 @@ describe('j-walk tests:set:array', () => {
 
   it('should set array value - specified by id. single, undefined property.', () => {
 
-    let base = {
+    var base = {
       'root': [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 30}]
     };
 
@@ -488,7 +488,7 @@ describe('j-walk tests:set:array', () => {
 
   it('should set array value - specified by id. single, undefined property. ignore sibling.', () => {
 
-    let base = {
+    var base = {
       'root': [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 30}]
     };
 
@@ -499,7 +499,7 @@ describe('j-walk tests:set:array', () => {
 
   it('should set array value - specified by id. undefined nested object value.', () => {
 
-    let base = {
+    var base = {
       'root': [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 30}]
     };
 
@@ -509,7 +509,7 @@ describe('j-walk tests:set:array', () => {
 
   it('should set array value - specified by id. defined empty nested object value.', () => {
 
-    let base = {
+    var base = {
       'root': [{id: 1, value: 10}, {id: 2, value: 20, secondary: {inner: 'foo'}}, {id: 3, value: 30}]
     };
 
@@ -519,7 +519,7 @@ describe('j-walk tests:set:array', () => {
 
   it('should set array value - specified by id. defined empty nested object value. ignore sibling.', () => {
 
-    let base = {
+    var base = {
       'root': [{id: 1, value: 10}, {id: 2, value: 20, secondary: {inner: 'foo'}}, {id: 3, value: 30}]
     };
 
@@ -530,7 +530,7 @@ describe('j-walk tests:set:array', () => {
 
   it('should set object value - mid array selector specified by id. immediate undefined object target. simple value', () => {
 
-    let base = {
+    var base = {
       'root': [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 30}]
     };
 
@@ -540,7 +540,7 @@ describe('j-walk tests:set:array', () => {
 
   it('should set object value - mid array selector specified by id. immediate undefined object target. object value', () => {
 
-    let base = {
+    var base = {
       'root': [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 30}]
     };
 
@@ -550,7 +550,7 @@ describe('j-walk tests:set:array', () => {
 
   it('should set object value - mid array selector specified by id. immediate defined object target. simple value', () => {
 
-    let base = {
+    var base = {
       'root': [{id: 1, value: 10}, {id: 2, value: 20, sub: 2}, {id: 3, value: 30}]
     };
 
@@ -560,7 +560,7 @@ describe('j-walk tests:set:array', () => {
 
   it('should set array value - traverse multiple specified arrays. defined object target.', () => {
 
-    let base = {
+    var base = {
       'root': [
         {id: 1, value: 10},
         {
@@ -579,7 +579,7 @@ describe('j-walk tests:set:array', () => {
 
   it('should set array value - traverse multiple specified arrays. undefined object target. ignore siblings', () => {
 
-    let base = {
+    var base = {
       'root': [
         {id: 1, value: 10},
         {
@@ -601,12 +601,12 @@ describe('j-walk tests:set:array', () => {
 describe('j-walk tests:exists', () => {
 
   it('should return:true - defined property', () => {
-    let base = {'root': null};
+    var base = {'root': null};
     jw(base).exists('root').should.be.true;
   });
 
   it('should return:true - defined property:nested', () => {
-    let base = {
+    var base = {
       'root': {
         'nested': {
           'deeper': null
@@ -617,7 +617,7 @@ describe('j-walk tests:exists', () => {
   });
 
   it('should return:true - defined property:nested - shallow target - complex object', () => {
-    let base = {
+    var base = {
       'root': {
         'nested': {
           'deeper': null
@@ -629,19 +629,19 @@ describe('j-walk tests:exists', () => {
   });
 
   it('should return:false - undefined property: object root', () => {
-    let base = {};
+    var base = {};
     jw(base).exists('root').should.be.false;
   });
 
   it('should return:false - undefined property: single nested', () => {
-    let base = {
+    var base = {
       'root': {}
     };
     jw(base).exists('root.sub').should.be.false;
   });
 
   it('should return:false - undefined property: deeply nested', () => {
-    let base = {
+    var base = {
       'root': {
         'sub': {}
       }
@@ -653,7 +653,7 @@ describe('j-walk tests:exists', () => {
 describe('j-walk tests:exists:array', () => {
 
   it('should return: true - base array with existing target object. whole object exists', () => {
-    let base = {
+    var base = {
       'root': [{id: 1, value: 21}, {id: 2, value: 42}]
     };
 
@@ -661,7 +661,7 @@ describe('j-walk tests:exists:array', () => {
   });
 
   it('should return: true - base array with existing target object. whole object sub property exists', () => {
-    let base = {
+    var base = {
       'root': [{id: 1, value: 21}, {id: 2, value: 42, target: 'foo'}]
     };
 
@@ -669,7 +669,7 @@ describe('j-walk tests:exists:array', () => {
   });
 
   it('should return: false - base array with non-existing target object. whole object exists', () => {
-    let base = {
+    var base = {
       'root': [{id: 1, value: 21}, {id: 2, value: 42}]
     };
 
@@ -677,7 +677,7 @@ describe('j-walk tests:exists:array', () => {
   });
 
   it('should return: true - base array with existing target object. whole object sub undefined property does not exist', () => {
-    let base = {
+    var base = {
       'root': [{id: 1, value: 21}, {id: 2, value: 42, target: 'foo'}]
     };
 
@@ -685,7 +685,7 @@ describe('j-walk tests:exists:array', () => {
   });
 
   it('should return: true -single nested array with existing target object. whole object exists', () => {
-    let base = {
+    var base = {
       'root': {
         collection: [{id: 1, value: 21}, {id: 2, value: 42}]
       }
@@ -695,7 +695,7 @@ describe('j-walk tests:exists:array', () => {
   });
 
   it('should return: true traverse multiple arrays. whole object exists', () => {
-    let base = {
+    var base = {
       'root': [
         {id: 1, value: 10},
         {
@@ -712,7 +712,7 @@ describe('j-walk tests:exists:array', () => {
   });
 
   it('should return: true traverse multiple arrays. whole object sub property exists', () => {
-    let base = {
+    var base = {
       'root': [
         {id: 1, value: 10},
         {
@@ -732,31 +732,31 @@ describe('j-walk tests:exists:array', () => {
 describe('j-walk tests:jwHelper', () => {
 
   it('should parse the dot notation selector query:single value', () => {
-    let query = 'root';
-    let expected = ['root'];
-    let actual = worker.parseQuery(query);
+    var query = 'root';
+    var expected = ['root'];
+    var actual = worker.parseQuery(query);
     actual.should.deep.equal(expected);
   });
 
   it('should parse the dot notation selector query:nested', () => {
-    let query = 'root.sub.nested';
-    let expected = ['root', 'sub', 'nested'];
-    let actual = worker.parseQuery(query);
+    var query = 'root.sub.nested';
+    var expected = ['root', 'sub', 'nested'];
+    var actual = worker.parseQuery(query);
     actual.should.deep.equal(expected);
   });
 
   it('should parse the dot notation selector query:single array', () => {
-    let query = 'root.sub.[sub-a].nested';
-    let expected = ['root', 'sub', ['sub-a'], 'nested'];
-    let actual = worker.parseQuery(query);
+    var query = 'root.sub.[sub-a].nested';
+    var expected = ['root', 'sub', ['sub-a'], 'nested'];
+    var actual = worker.parseQuery(query);
 
     actual.should.deep.equal(expected);
   });
 
   it('should parse the dot notation selector query:nested array', () => {
-    let query = 'root.sub.[sub-a].nested.[sub-b].last';
-    let expected = ['root', 'sub', ['sub-a'], 'nested', ['sub-b'], 'last'];
-    let actual = worker.parseQuery(query);
+    var query = 'root.sub.[sub-a].nested.[sub-b].last';
+    var expected = ['root', 'sub', ['sub-a'], 'nested', ['sub-b'], 'last'];
+    var actual = worker.parseQuery(query);
     actual.should.deep.equal(expected);
   });
 
