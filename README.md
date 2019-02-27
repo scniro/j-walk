@@ -83,7 +83,7 @@ let base = {};
 
 jwalk(base).set('root.nested.sub', 42);
 jwalk(base).set('root.nested', { sub: 42 });
-// base = { root: { sub: { nested: 42 } } }
+// base = { root: { nested: { sub: 42 } } }
 
 let base = {
   'root': [
